@@ -40,11 +40,12 @@
 
 # Change Log:
 # 1.2 Use the platform module to help determine OS.
+# 1.3 Changed ctypes.windll.user32.OpenClipboard(None) to ctypes.windll.user32.OpenClipboard(0), after some people ran into some TypeError
 
 import platform, os
 
 def winGetClipboard():
-    ctypes.windll.user32.OpenClipboard(None)
+    ctypes.windll.user32.OpenClipboard(0)
     pcontents = ctypes.windll.user32.GetClipboardData(1) # 1 is CF_TEXT
     data = ctypes.c_char_p(pcontents).value
     #ctypes.windll.kernel32.GlobalUnlock(pcontents)
@@ -53,7 +54,7 @@ def winGetClipboard():
 
 def winSetClipboard(text):
     GMEM_DDESHARE = 0x2000
-    ctypes.windll.user32.OpenClipboard(None)
+    ctypes.windll.user32.OpenClipboard(0)
     ctypes.windll.user32.EmptyClipboard()
     try:
         # works on Python 2 (bytes() only takes one argument)
