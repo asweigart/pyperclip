@@ -1,4 +1,4 @@
-# Pyperclip v1.2
+# Pyperclip v1.3
 # A cross-platform clipboard module for Python. (only handles plain text for now)
 # By Al Sweigart al@coffeeghost.net
 
