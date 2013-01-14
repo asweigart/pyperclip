@@ -1,4 +1,5 @@
-# Pyperclip v1.3
+# Pyperclip v1.4
+
 # A cross-platform clipboard module for Python. (only handles plain text for now)
 # By Al Sweigart al@coffeeghost.net
 
@@ -53,6 +54,7 @@ def winGetClipboard():
     return data
 
 def winSetClipboard(text):
+    text = str(text)
     GMEM_DDESHARE = 0x2000
     ctypes.windll.user32.OpenClipboard(0)
     ctypes.windll.user32.EmptyClipboard()
@@ -70,10 +72,11 @@ def winSetClipboard(text):
         # works on Python 3 (bytes() requires an encoding)
         ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), bytes(text, 'ascii'))
     ctypes.windll.kernel32.GlobalUnlock(hCd)
-    ctypes.windll.user32.SetClipboardData(1,hCd)
+    ctypes.windll.user32.SetClipboardData(1, hCd)
     ctypes.windll.user32.CloseClipboard()
 
 def macSetClipboard(text):
+    text = str(text)
     outf = os.popen('pbcopy', 'w')
     outf.write(text)
     outf.close()
@@ -88,6 +91,8 @@ def gtkGetClipboard():
     return gtk.Clipboard().wait_for_text()
 
 def gtkSetClipboard(text):
+    global cb
+    text = str(text)
     cb = gtk.Clipboard()
     cb.set_text(text)
     cb.store()
@@ -96,9 +101,11 @@ def qtGetClipboard():
     return str(cb.text())
 
 def qtSetClipboard(text):
+    text = str(text)
     cb.setText(text)
 
 def xclipSetClipboard(text):
+    text = str(text)
     outf = os.popen('xclip -selection c', 'w')
     outf.write(text)
     outf.close()
@@ -110,6 +117,7 @@ def xclipGetClipboard():
     return content
 
 def xselSetClipboard(text):
+    text = str(text)
     outf = os.popen('xsel -i', 'w')
     outf.write(text)
     outf.close()
@@ -142,11 +150,11 @@ elif os.name == 'posix' or platform.system() == 'Linux':
             import gtk
             getcb = gtkGetClipboard
             setcb = gtkSetClipboard
-        except:
+        except Exception:
             try:
                 import PyQt4.QtCore
                 import PyQt4.QtGui
-                app = QApplication([])
+                app = PyQt4.QApplication([])
                 cb = PyQt4.QtGui.QApplication.clipboard()
                 getcb = qtGetClipboard
                 setcb = qtSetClipboard
