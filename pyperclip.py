@@ -44,7 +44,7 @@
 # 1.3 Changed ctypes.windll.user32.OpenClipboard(None) to ctypes.windll.user32.OpenClipboard(0), after some people ran into some TypeError
 
 import platform, os
-from subprocess import call, DEVNULL
+from subprocess import call, Popen, PIPE
 
 def winGetClipboard():
     ctypes.windll.user32.OpenClipboard(0)
@@ -78,15 +78,18 @@ def winSetClipboard(text):
 
 def macSetClipboard(text):
     text = str(text)
-    outf = os.popen('pbcopy', 'w')
-    outf.write(text)
-    outf.close()
+    p = Popen(['pbcopy', 'w'], stdin=PIPE)
+    try:
+        # works on Python 3 (bytes() requires an encoding)
+        p.communicate(input=bytes(text, 'utf-8'))
+    except TypeError:
+        # works on Python 2 (bytes() only takes one argument)
+        p.communicate(input=bytes(text))
 
 def macGetClipboard():
-    outf = os.popen('pbpaste', 'r')
-    content = outf.read()
-    outf.close()
-    return content
+    p = Popen(['pbpaste', 'r'])
+    stdout, stderr = p.communicate()
+    return bytes.decode(stdout)
 
 def gtkGetClipboard():
     return gtk.Clipboard().wait_for_text()
@@ -106,28 +109,33 @@ def qtSetClipboard(text):
     cb.setText(text)
 
 def xclipSetClipboard(text):
-    text = str(text)
-    outf = os.popen('xclip -selection c', 'w')
-    outf.write(text)
-    outf.close()
+    p = Popen(['xclip', '-selection', 'c'], stdin=PIPE)
+    try:
+        # works on Python 3 (bytes() requires an encoding)
+        p.communicate(input=bytes(text, 'utf-8'))
+    except TypeError:
+        # works on Python 2 (bytes() only takes one argument)
+        p.communicate(input=bytes(text))
 
 def xclipGetClipboard():
-    outf = os.popen('xclip -selection c -o', 'r')
-    content = outf.read()
-    outf.close()
-    return content
+    p = Popen(['xclip', '-selection', 'c', '-o'], stdout=PIPE)
+    stdout, stderr = p.communicate()
+    return bytes.decode(stdout)
 
 def xselSetClipboard(text):
-    text = str(text)
-    outf = os.popen('xsel -i', 'w')
-    outf.write(text)
-    outf.close()
+    p = Popen(['xsel', '-i'], stdin=PIPE)
+    try:
+        # works on Python 3 (bytes() requires an encoding)
+        p.communicate(input=bytes(text, 'utf-8'))
+    except TypeError:
+        # works on Python 2 (bytes() only takes one argument)
+        p.communicate(input=bytes(text))
+
 
 def xselGetClipboard():
-    outf = os.popen('xsel -o', 'r')
-    content = outf.read()
-    outf.close()
-    return content
+    p = Popen(['xsel', '-o'], stdin=PIPE)
+    stdout, stderr = p.communicate()
+    return bytes.decode(stdout)
 
 
 if os.name == 'nt' or platform.system() == 'Windows':
@@ -139,13 +147,13 @@ elif os.name == 'mac' or platform.system() == 'Darwin':
     setcb = macSetClipboard
 elif os.name == 'posix' or platform.system() == 'Linux':
     xclipExists = call(['which', 'xclip'], 
-		stdout=DEVNULL, stderr=DEVNULL) == 0
+                stdout=PIPE, stderr=PIPE) == 0
     if xclipExists:
         getcb = xclipGetClipboard
         setcb = xclipSetClipboard
     else:
         xselExists = call(['which', 'xsel'], 
-		stdout=DEVNULL, stderr=DEVNULL) == 0
+                stdout=PIPE, stderr=PIPE) == 0
         if xselExists:
             getcb = xselGetClipboard
             setcb = xselSetClipboard
