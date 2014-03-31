@@ -44,6 +44,7 @@
 # 1.3 Changed ctypes.windll.user32.OpenClipboard(None) to ctypes.windll.user32.OpenClipboard(0), after some people ran into some TypeError
 
 import platform, os
+from subprocess import call, DEVNULL
 
 def winGetClipboard():
     ctypes.windll.user32.OpenClipboard(0)
@@ -137,12 +138,14 @@ elif os.name == 'mac' or platform.system() == 'Darwin':
     getcb = macGetClipboard
     setcb = macSetClipboard
 elif os.name == 'posix' or platform.system() == 'Linux':
-    xclipExists = os.system('which xclip') == 0
+    xclipExists = call(['which', 'xclip'], 
+		stdout=DEVNULL, stderr=DEVNULL) == 0
     if xclipExists:
         getcb = xclipGetClipboard
         setcb = xclipSetClipboard
     else:
-        xselExists = os.system('which xsel') == 0
+        xselExists = call(['which', 'xsel'], 
+		stdout=DEVNULL, stderr=DEVNULL) == 0
         if xselExists:
             getcb = xselGetClipboard
             setcb = xselSetClipboard
