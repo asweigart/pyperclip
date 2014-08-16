@@ -4,4 +4,5 @@ answer newbie questions, and generally made Django that much better:
 
 Al Sweigart
 Alexander Cobleigh ‏@cblgh
+Steve Elam
 ZEDGR https://github.com/ZEDGR
