@@ -211,10 +211,6 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         _functions = 'xclip command' # for debugging
         paste = _pasteXclip
         copy = _copyXclip
-    elif xselExists:
-        _functions = 'xsel command' # for debugging
-        paste = _pasteXsel
-        copy = _copyXsel
     elif gtkInstalled:
         _functions = 'gtk module' # for debugging
         paste = _pasteGtk
@@ -225,6 +221,11 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         cb = PyQt4.QtGui.QApplication.clipboard()
         paste = _pasteQt
         copy = _copyQt
+    elif xselExists:
+        # TODO: xsel doesn't seem to work on Raspberry Pi (my test Linux environment). Putting this as the last method tried.
+        _functions = 'xsel command' # for debugging
+        paste = _pasteXsel
+        copy = _copyXsel
     else:
         raise Exception('Pyperclip requires the xclip or xsel application, or the gtk or PyQt4 module.')
 
