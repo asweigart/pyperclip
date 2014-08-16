@@ -1,0 +1,3 @@
+v1.5.0, 2014/08/16 -- Refactored code to put it on PyPI. Also added support on Cygwin platforms and unit tests.
+v1.3.0, 2011/09/13 -- Changed ctypes.windll.user32.OpenClipboard(None) to ctypes.windll.user32.OpenClipboard(0), after some people ran into some TypeError
+v1.2.0, 2011/06/14 -- Use the platform module to help determine OS.

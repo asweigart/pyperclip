@@ -15,10 +15,8 @@
 
 # The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
 
-# Change Log:
-# 1.2 Use the platform module to help determine OS.
-# 1.3 Changed ctypes.windll.user32.OpenClipboard(None) to ctypes.windll.user32.OpenClipboard(0), after some people ran into some TypeError
-# 1.5 Refactored code to put it on PyPI. Also added support on Cygwin platforms and unit tests.
+
+__version__ = '1.5.0'
 
 import platform, os
 from subprocess import call, Popen, PIPE
