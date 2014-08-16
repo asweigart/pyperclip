@@ -57,6 +57,42 @@ def _copyWindows(text):
     ctypes.windll.user32.CloseClipboard()
 
 
+def _pasteCygwin():
+    ctypes.cdll.user32.OpenClipboard(0)
+    pcontents = ctypes.cdll.user32.GetClipboardData(1) # 1 is CF_TEXT
+    data = ctypes.c_char_p(pcontents).value
+    #ctypes.cdll.kernel32.GlobalUnlock(pcontents)
+    ctypes.cdll.user32.CloseClipboard()
+
+    if type(data) == bytes:
+        # Running on Python 3
+        data = data.decode() # utf-8 by default, which is possibly not correct. TODO - check this
+    return data
+
+
+def _copyCygwin(text):
+    text = str(text)
+    GMEM_DDESHARE = 0x2000
+    ctypes.cdll.user32.OpenClipboard(0)
+    ctypes.cdll.user32.EmptyClipboard()
+    try:
+        # works on Python 2 (bytes() only takes one argument)
+        hCd = ctypes.cdll.kernel32.GlobalAlloc(GMEM_DDESHARE, len(bytes(text))+1)
+    except TypeError:
+        # works on Python 3 (bytes() requires an encoding)
+        hCd = ctypes.cdll.kernel32.GlobalAlloc(GMEM_DDESHARE, len(bytes(text, 'ascii'))+1)
+    pchData = ctypes.cdll.kernel32.GlobalLock(hCd)
+    try:
+        # works on Python 2 (bytes() only takes one argument)
+        ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), bytes(text))
+    except TypeError:
+        # works on Python 3 (bytes() requires an encoding)
+        ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), bytes(text, 'ascii'))
+    ctypes.cdll.kernel32.GlobalUnlock(hCd)
+    ctypes.cdll.user32.SetClipboardData(1, hCd)
+    ctypes.cdll.user32.CloseClipboard()
+
+
 def _copyOSX(text):
     text = str(text)
     p = Popen(['pbcopy', 'w'], stdin=PIPE)
@@ -129,8 +165,13 @@ def _pasteXsel():
 
 
 # Determine the OS/platform and set the copy() and paste() functions accordingly.
-if (os.name == 'nt') or (platform.system() == 'Windows') or ('cygwin' in platform.system().lower()):
-    _functions = 'Windows/Cygwin' # for debugging
+if 'cygwin' in platform.system().lower():
+    _functions = 'Cygwin' # for debugging
+    import ctypes
+    paste = _pasteCygwin
+    copy = _copyCygwin
+elif os.name == 'nt' or platform.system() == 'Windows':
+    _functions = 'Windows' # for debugging
     import ctypes
     paste = _pasteWindows
     copy = _copyWindows
