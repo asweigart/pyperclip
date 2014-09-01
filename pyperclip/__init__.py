@@ -159,7 +159,7 @@ def _copyXsel(text):
 
 
 def _pasteXsel():
-    p = Popen(['xsel', '-o'], stdin=PIPE)
+    p = Popen(['xsel', '-o'], stdout=PIPE)
     stdout, stderr = p.communicate()
     return bytes.decode(stdout)
 
