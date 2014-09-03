@@ -1,4 +1,4 @@
-# Pyperclip v1.5.1
+# Pyperclip
 
 # A cross-platform clipboard module for Python. (only handles plain text for now)
 # By Al Sweigart al@inventwithpython.com
@@ -17,7 +17,7 @@
 # The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
 
 
-__version__ = '1.5.1'
+__version__ = '1.5.2'
 
 import platform, os
 from subprocess import call, Popen, PIPE
