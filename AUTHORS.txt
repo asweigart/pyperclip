@@ -6,3 +6,5 @@ Al Sweigart
 Alexander Cobleigh ‏@cblgh
 Steve Elam
 ZEDGR https://github.com/ZEDGR
+Chris Clark
+Nikolaos-Digenis Karagiannis
