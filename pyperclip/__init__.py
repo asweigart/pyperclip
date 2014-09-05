@@ -17,7 +17,7 @@
 # The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
 
 
-__version__ = '1.5.2'
+__version__ = '1.5.3'
 
 import platform, os
 from subprocess import call, Popen, PIPE
