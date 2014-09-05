@@ -20,7 +20,7 @@
 __version__ = '1.5.3'
 
 import platform, os
-from subprocess import call, Popen, PIPE
+from subprocess import call, check_output, Popen, PIPE
 
 def _pasteWindows():
     ctypes.windll.user32.OpenClipboard(0)
@@ -106,9 +106,7 @@ def _copyOSX(text):
 
 
 def _pasteOSX():
-    p = Popen(['pbpaste', 'r'])
-    stdout, stderr = p.communicate()
-    return bytes.decode(stdout)
+    return check_output(['pbpaste', 'r'], universal_newlines=True)
 
 
 def _pasteGtk():
@@ -228,4 +226,5 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         copy = _copyXsel
     else:
         raise Exception('Pyperclip requires the xclip or xsel application, or the gtk or PyQt4 module.')
-
+else:
+    raise RuntimeError('pyperclip does not support your system.')
