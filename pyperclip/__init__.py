@@ -17,10 +17,10 @@
 # The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
 
 
-__version__ = '1.5.3'
+__version__ = '1.5.4'
 
 import platform, os
-from subprocess import call, check_output, Popen, PIPE
+from subprocess import call, Popen, PIPE
 
 def _pasteWindows():
     ctypes.windll.user32.OpenClipboard(0)
@@ -106,7 +106,9 @@ def _copyOSX(text):
 
 
 def _pasteOSX():
-    return check_output(['pbpaste', 'r'], universal_newlines=True)
+    p = Popen(['pbpaste', 'r'], stdout=PIPE)
+    stdout, stderr = p.communicate()
+    return bytes.decode(stdout)
 
 
 def _pasteGtk():
