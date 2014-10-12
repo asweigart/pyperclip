@@ -58,6 +58,11 @@ def _copyWindows(text):
     ctypes.windll.user32.CloseClipboard()
 
 
+def _clearWindows():
+    ctypes.windll.user32.OpenClipboard(0)
+    ctypes.windll.user32.EmptyClipboard()
+
+
 def _pasteCygwin():
     ctypes.cdll.user32.OpenClipboard(0)
     pcontents = ctypes.cdll.user32.GetClipboardData(1) # 1 is CF_TEXT
@@ -94,6 +99,11 @@ def _copyCygwin(text):
     ctypes.cdll.user32.CloseClipboard()
 
 
+def _clearCygwin():
+    ctypes.windll.user32.OpenClipboard(0)
+    ctypes.windll.user32.EmptyClipboard()
+
+
 def _copyOSX(text):
     text = str(text)
     p = Popen(['pbcopy', 'w'], stdin=PIPE)
@@ -123,6 +133,10 @@ def _copyGtk(text):
     cb.store()
 
 
+def _clearGtk():
+    gtk.Clipboard().clear()
+
+
 def _pasteQt():
     return str(cb.text())
 
@@ -130,6 +144,10 @@ def _pasteQt():
 def _copyQt(text):
     text = str(text)
     cb.setText(text)
+
+
+def _clearQt():
+    cb.clear()
 
 
 def _copyXclip(text):
@@ -164,6 +182,14 @@ def _pasteXsel():
     return bytes.decode(stdout)
 
 
+def _clearXsel():
+    call(['xsel', '--clear'])
+
+
+def _clearFallback():
+    copy("")
+
+
 
 # Determine the OS/platform and set the copy() and paste() functions accordingly.
 if 'cygwin' in platform.system().lower():
@@ -171,15 +197,18 @@ if 'cygwin' in platform.system().lower():
     import ctypes
     paste = _pasteCygwin
     copy = _copyCygwin
+    clear = _clearCygwin
 elif os.name == 'nt' or platform.system() == 'Windows':
     _functions = 'Windows' # for debugging
     import ctypes
     paste = _pasteWindows
     copy = _copyWindows
+    clear = _clearWindows
 elif os.name == 'mac' or platform.system() == 'Darwin':
     _functions = 'OS X pbcopy/pbpaste' # for debugging
     paste = _pasteOSX
     copy = _copyOSX
+    clear = _clearFallback
 elif os.name == 'posix' or platform.system() == 'Linux':
     # Determine which command/module is installed, if any.
     xclipExists = call(['which', 'xclip'],
@@ -211,21 +240,25 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         _functions = 'xclip command' # for debugging
         paste = _pasteXclip
         copy = _copyXclip
+        clear = _clearFallback
     elif gtkInstalled:
         _functions = 'gtk module' # for debugging
         paste = _pasteGtk
         copy = _copyGtk
+        clear = _clearGtk
     elif PyQt4Installed:
         _functions = 'PyQt4 module' # for debugging
         app = PyQt4.QtGui.QApplication([])
         cb = PyQt4.QtGui.QApplication.clipboard()
         paste = _pasteQt
         copy = _copyQt
+        clear = _clearQt
     elif xselExists:
         # TODO: xsel doesn't seem to work on Raspberry Pi (my test Linux environment). Putting this as the last method tried.
         _functions = 'xsel command' # for debugging
         paste = _pasteXsel
         copy = _copyXsel
+        clear = _clearXsel
     else:
         raise Exception('Pyperclip requires the xclip or xsel application, or the gtk or PyQt4 module.')
 else:
