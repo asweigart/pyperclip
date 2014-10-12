@@ -6,6 +6,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import pyperclip
 
+
 class TestCopyPaste(unittest.TestCase):
     def test_copyPaste(self):
         pyVersion = '%s.%s.%s' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
@@ -22,6 +23,11 @@ class TestCopyPaste(unittest.TestCase):
         msg = ''.join(msg)
         pyperclip.copy(msg)
         self.assertEqual(pyperclip.paste(), msg)
+
+    def test_clear(self):
+        pyperclip.copy("test string")
+        pyperclip.clear()
+        self.assertEqual(pyperclip.paste(), "")
 
 if __name__ == '__main__':
     unittest.main()

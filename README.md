@@ -10,6 +10,10 @@ Example Usage
     >>> pyperclip.copy('The text to be copied to the clipboard.')
     >>> pyperclip.paste()
     'The text to be copied to the clipboard.'
+    >>> pyperclip.copy('Some new text')
+    >>> pyperclip.clear()
+    >>> pyperclip.paste()
+    ''
 
 
 Currently only handles plaintext.
