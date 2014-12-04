@@ -1,3 +1,4 @@
+v1.5.5, 2014/12/04 -- Bug fix for unicode on Windows.
 v1.5.4, 2014/09/09 -- Undoing OS X paste() bug fix because it requires 2.7, breaks pre2.7 versions.
 v1.5.3, 2014/09/05 -- Bug fix for OS X paste(). Thanks to sscherfke
 v1.5.2, 2014/08/24 -- Bug fix in xsel paste function. Thanks to Nikolaos-Digenis Karagiannis.

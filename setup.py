@@ -3,12 +3,9 @@ from setuptools import setup
 
 
 # Dynamically calculate the version based on pyperclip.VERSION.
-version = __import__('pyperclip').__version__
-
-
 setup(
     name='pyperclip',
-    version=version,
+    version='1.5.5',
     url='https://github.com/asweigart/pyperclip',
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
