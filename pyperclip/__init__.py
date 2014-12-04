@@ -24,28 +24,28 @@ from subprocess import call, Popen, PIPE
 
 
 def _pasteWindows():
-	OpenClipboard(None)
-	handle = GetClipboardData(CF_UNICODETEXT)
-	data = ctypes.c_wchar_p(handle).value
-	CloseClipboard()
-	return data
+    OpenClipboard(None)
+    handle = GetClipboardData(CF_UNICODETEXT)
+    data = ctypes.c_wchar_p(handle).value
+    CloseClipboard()
+    return data
 
 
 def _copyWindows(text):
-	try:  # Python 2
-		if not isinstance(text, unicode):
-			text = text.decode('mbcs')
-	except NameError:
-		if not isinstance(text, str):
-			text = text.decode('mbcs')
-	OpenClipboard(None)
-	EmptyClipboard()
-	hCd = GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
-	pchData = GlobalLock(hCd)
-	wcscpy(ctypes.c_wchar_p(pchData), text)
-	GlobalUnlock(hCd)
-	SetClipboardData(CF_UNICODETEXT, hCd)
-	CloseClipboard()
+    try:  # Python 2
+        if not isinstance(text, unicode):
+            text = text.decode('mbcs')
+    except NameError:
+        if not isinstance(text, str):
+            text = text.decode('mbcs')
+    OpenClipboard(None)
+    EmptyClipboard()
+    hCd = GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
+    pchData = GlobalLock(hCd)
+    wcscpy(ctypes.c_wchar_p(pchData), text)
+    GlobalUnlock(hCd)
+    SetClipboardData(CF_UNICODETEXT, hCd)
+    CloseClipboard()
 
 
 def _pasteCygwin():
