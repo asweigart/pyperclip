@@ -22,40 +22,30 @@ __version__ = '1.5.4'
 import platform, os
 from subprocess import call, Popen, PIPE
 
-def _pasteWindows():
-    ctypes.windll.user32.OpenClipboard(0)
-    pcontents = ctypes.windll.user32.GetClipboardData(1) # 1 is CF_TEXT
-    data = ctypes.c_char_p(pcontents).value
-    #ctypes.windll.kernel32.GlobalUnlock(pcontents)
-    ctypes.windll.user32.CloseClipboard()
 
-    if type(data) == bytes:
-        # Running on Python 3
-        data = data.decode() # utf-8 by default, which is possibly not correct. TODO - check this
-    return data
+def _pasteWindows():
+	OpenClipboard(None)
+	handle = GetClipboardData(CF_UNICODETEXT)
+	data = ctypes.c_wchar_p(handle).value
+	CloseClipboard()
+	return data
 
 
 def _copyWindows(text):
-    text = str(text)
-    GMEM_DDESHARE = 0x2000
-    ctypes.windll.user32.OpenClipboard(0)
-    ctypes.windll.user32.EmptyClipboard()
-    try:
-        # works on Python 2 (bytes() only takes one argument)
-        hCd = ctypes.windll.kernel32.GlobalAlloc(GMEM_DDESHARE, len(bytes(text))+1)
-    except TypeError:
-        # works on Python 3 (bytes() requires an encoding)
-        hCd = ctypes.windll.kernel32.GlobalAlloc(GMEM_DDESHARE, len(bytes(text, 'ascii'))+1)
-    pchData = ctypes.windll.kernel32.GlobalLock(hCd)
-    try:
-        # works on Python 2 (bytes() only takes one argument)
-        ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), bytes(text))
-    except TypeError:
-        # works on Python 3 (bytes() requires an encoding)
-        ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), bytes(text, 'ascii'))
-    ctypes.windll.kernel32.GlobalUnlock(hCd)
-    ctypes.windll.user32.SetClipboardData(1, hCd)
-    ctypes.windll.user32.CloseClipboard()
+	try:  # Python 2
+		if not isinstance(text, unicode):
+			text = text.decode('mbcs')
+	except NameError:
+		if not isinstance(text, str):
+			text = text.decode('mbcs')
+	OpenClipboard(None)
+	EmptyClipboard()
+	hCd = GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
+	pchData = GlobalLock(hCd)
+	wcscpy(ctypes.c_wchar_p(pchData), text)
+	GlobalUnlock(hCd)
+	SetClipboardData(CF_UNICODETEXT, hCd)
+	CloseClipboard()
 
 
 def _pasteCygwin():
