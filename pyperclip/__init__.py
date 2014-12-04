@@ -50,38 +50,28 @@ def _copyWindows(text):
 
 
 def _pasteCygwin():
-    ctypes.cdll.user32.OpenClipboard(0)
-    pcontents = ctypes.cdll.user32.GetClipboardData(1) # 1 is CF_TEXT
-    data = ctypes.c_char_p(pcontents).value
-    #ctypes.cdll.kernel32.GlobalUnlock(pcontents)
+    ctypes.cdll.user32.OpenClipboard(None)
+    handle = ctypes.cdll.user32.GetClipboardData(13)  # CF_UNICODETEXT
+    data = ctypes.c_wchar_p(handle).value
     ctypes.cdll.user32.CloseClipboard()
-
-    if type(data) == bytes:
-        # Running on Python 3
-        data = data.decode() # utf-8 by default, which is possibly not correct. TODO - check this
     return data
 
 
 def _copyCygwin(text):
-    text = str(text)
     GMEM_DDESHARE = 0x2000
-    ctypes.cdll.user32.OpenClipboard(0)
+    try:  # Python 2
+        if not isinstance(text, unicode):
+            text = text.decode('mbcs')
+    except NameError:
+        if not isinstance(text, str):
+            text = text.decode('mbcs')
+    ctypes.cdll.user32.OpenClipboard(None)
     ctypes.cdll.user32.EmptyClipboard()
-    try:
-        # works on Python 2 (bytes() only takes one argument)
-        hCd = ctypes.cdll.kernel32.GlobalAlloc(GMEM_DDESHARE, len(bytes(text))+1)
-    except TypeError:
-        # works on Python 3 (bytes() requires an encoding)
-        hCd = ctypes.cdll.kernel32.GlobalAlloc(GMEM_DDESHARE, len(bytes(text, 'ascii'))+1)
+    hCd = ctypes.cdll.kernel32.GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
     pchData = ctypes.cdll.kernel32.GlobalLock(hCd)
-    try:
-        # works on Python 2 (bytes() only takes one argument)
-        ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), bytes(text))
-    except TypeError:
-        # works on Python 3 (bytes() requires an encoding)
-        ctypes.cdll.msvcrt.strcpy(ctypes.c_char_p(pchData), bytes(text, 'ascii'))
+    ctypes.cdll.msvcrt.wcscpy(ctypes.c_wchar_p(pchData), text)
     ctypes.cdll.kernel32.GlobalUnlock(hCd)
-    ctypes.cdll.user32.SetClipboardData(1, hCd)
+    ctypes.cdll.user32.SetClipboardData(13, hCd)  # CF_UNICODETEXT
     ctypes.cdll.user32.CloseClipboard()
 
 
