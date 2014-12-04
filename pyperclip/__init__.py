@@ -24,28 +24,29 @@ from subprocess import call, Popen, PIPE
 
 
 def _pasteWindows():
-    OpenClipboard(None)
-    handle = GetClipboardData(CF_UNICODETEXT)
+    ctypes.windll.user32.OpenClipboard(None)
+    handle = ctypes.windll.user32.GetClipboardData(13)  # CF_UNICODETEXT
     data = ctypes.c_wchar_p(handle).value
-    CloseClipboard()
+    ctypes.windll.user32.CloseClipboard()
     return data
 
 
 def _copyWindows(text):
+    GMEM_DDESHARE = 0x2000
     try:  # Python 2
         if not isinstance(text, unicode):
             text = text.decode('mbcs')
     except NameError:
         if not isinstance(text, str):
             text = text.decode('mbcs')
-    OpenClipboard(None)
-    EmptyClipboard()
-    hCd = GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
-    pchData = GlobalLock(hCd)
-    wcscpy(ctypes.c_wchar_p(pchData), text)
-    GlobalUnlock(hCd)
-    SetClipboardData(CF_UNICODETEXT, hCd)
-    CloseClipboard()
+    ctypes.windll.user32.OpenClipboard(None)
+    ctypes.windll.user32.EmptyClipboard()
+    hCd = ctypes.windll.kernel32.GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
+    pchData = ctypes.windll.kernel32.GlobalLock(hCd)
+    ctypes.cdll.msvcrt.wcscpy(ctypes.c_wchar_p(pchData), text)
+    ctypes.windll.kernel32.GlobalUnlock(hCd)
+    ctypes.windll.user32.SetClipboardData(13, hCd)  # CF_UNICODETEXT
+    ctypes.windll.user32.CloseClipboard()
 
 
 def _pasteCygwin():
