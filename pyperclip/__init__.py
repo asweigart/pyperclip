@@ -1,21 +1,22 @@
-# Pyperclip
+"""
+Pyperclip
 
-# A cross-platform clipboard module for Python. (only handles plain text for now)
-# By Al Sweigart al@inventwithpython.com
-# BSD License
+A cross-platform clipboard module for Python. (only handles plain text for now)
+By Al Sweigart al@inventwithpython.com
+BSD License
 
-# Usage:
-#   import pyperclip
-#   pyperclip.copy('The text to be copied to the clipboard.')
-#   spam = pyperclip.paste()
+Usage:
+  import pyperclip
+  pyperclip.copy('The text to be copied to the clipboard.')
+  spam = pyperclip.paste()
 
-# On Windows, no additional modules are needed.
-# On Mac, this module makes use of the pbcopy and pbpaste commands, which should come with the os.
-# On Linux, this module makes use of the xclip or xsel commands, which should come with the os. Otherwise run "sudo apt-get install xclip" or "sudo apt-get install xsel"
-#   Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
+On Windows, no additional modules are needed.
+On Mac, this module makes use of the pbcopy and pbpaste commands, which should come with the os.
+On Linux, this module makes use of the xclip or xsel commands, which should come with the os. Otherwise run "sudo apt-get install xclip" or "sudo apt-get install xsel"
+  Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
 
-# The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
-
+The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
+"""
 
 __version__ = '1.5.5'
 
@@ -24,55 +25,63 @@ from subprocess import call, Popen, PIPE
 
 
 def _pasteWindows():
-    ctypes.windll.user32.OpenClipboard(None)
-    handle = ctypes.windll.user32.GetClipboardData(13)  # CF_UNICODETEXT
+    CF_UNICODETEXT = 13
+    d = ctypes.windll
+    d.user32.OpenClipboard(None)
+    handle = d.user32.GetClipboardData(CF_UNICODETEXT)
     data = ctypes.c_wchar_p(handle).value
-    ctypes.windll.user32.CloseClipboard()
+    d.user32.CloseClipboard()
     return data
 
 
 def _copyWindows(text):
     GMEM_DDESHARE = 0x2000
+    CF_UNICODETEXT = 13
+    d = ctypes.windll # cdll expects 4 more bytes in user32.OpenClipboard(None)
     try:  # Python 2
         if not isinstance(text, unicode):
             text = text.decode('mbcs')
     except NameError:
         if not isinstance(text, str):
             text = text.decode('mbcs')
-    ctypes.windll.user32.OpenClipboard(None)
-    ctypes.windll.user32.EmptyClipboard()
-    hCd = ctypes.windll.kernel32.GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
-    pchData = ctypes.windll.kernel32.GlobalLock(hCd)
+    d.user32.OpenClipboard(None)
+    d.user32.EmptyClipboard()
+    hCd = d.kernel32.GlobalAlloc(GMEM_DDESHARE, len(text.encode('utf-16-le')) + 2)
+    pchData = d.kernel32.GlobalLock(hCd)
     ctypes.cdll.msvcrt.wcscpy(ctypes.c_wchar_p(pchData), text)
-    ctypes.windll.kernel32.GlobalUnlock(hCd)
-    ctypes.windll.user32.SetClipboardData(13, hCd)  # CF_UNICODETEXT
-    ctypes.windll.user32.CloseClipboard()
+    d.kernel32.GlobalUnlock(hCd)
+    d.user32.SetClipboardData(CF_UNICODETEXT, hCd)
+    d.user32.CloseClipboard()
 
 
 def _pasteCygwin():
-    ctypes.cdll.user32.OpenClipboard(None)
-    handle = ctypes.cdll.user32.GetClipboardData(13)  # CF_UNICODETEXT
+    CF_UNICODETEXT = 13
+    d = ctypes.cdll
+    d.user32.OpenClipboard(None)
+    handle = d.user32.GetClipboardData(CF_UNICODETEXT)
     data = ctypes.c_wchar_p(handle).value
-    ctypes.cdll.user32.CloseClipboard()
+    d.user32.CloseClipboard()
     return data
 
 
 def _copyCygwin(text):
     GMEM_DDESHARE = 0x2000
+    CF_UNICODETEXT = 13
+    d = ctypes.cdll
     try:  # Python 2
         if not isinstance(text, unicode):
             text = text.decode('mbcs')
     except NameError:
         if not isinstance(text, str):
             text = text.decode('mbcs')
-    ctypes.cdll.user32.OpenClipboard(None)
-    ctypes.cdll.user32.EmptyClipboard()
-    hCd = ctypes.cdll.kernel32.GlobalAlloc(GMEM_DDESHARE, 2 * (len(text) + 1))
-    pchData = ctypes.cdll.kernel32.GlobalLock(hCd)
+    d.user32.OpenClipboard(None)
+    d.user32.EmptyClipboard()
+    hCd = d.kernel32.GlobalAlloc(GMEM_DDESHARE, len(text.encode('utf-16-le')) + 2)
+    pchData = d.kernel32.GlobalLock(hCd)
     ctypes.cdll.msvcrt.wcscpy(ctypes.c_wchar_p(pchData), text)
-    ctypes.cdll.kernel32.GlobalUnlock(hCd)
-    ctypes.cdll.user32.SetClipboardData(13, hCd)  # CF_UNICODETEXT
-    ctypes.cdll.user32.CloseClipboard()
+    d.kernel32.GlobalUnlock(hCd)
+    d.user32.SetClipboardData(CF_UNICODETEXT, hCd)
+    d.user32.CloseClipboard()
 
 
 def _copyOSX(text):
