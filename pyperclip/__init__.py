@@ -27,7 +27,10 @@ from subprocess import call, Popen, PIPE
 def _pasteWindows():
     CF_UNICODETEXT = 13
     d = ctypes.windll
-    d.user32.OpenClipboard(None)
+    try:
+        d.user32.OpenClipboard(None) # Works on Python 3
+    except ctypes.ArgumentError:
+        d.user32.OpenClipboard(0) # Works on Python 2
     handle = d.user32.GetClipboardData(CF_UNICODETEXT)
     data = ctypes.c_wchar_p(handle).value
     d.user32.CloseClipboard()
@@ -37,14 +40,19 @@ def _pasteWindows():
 def _copyWindows(text):
     GMEM_DDESHARE = 0x2000
     CF_UNICODETEXT = 13
-    d = ctypes.windll # cdll expects 4 more bytes in user32.OpenClipboard(None)
+    d = ctypes.windll # cdll expects 4 more bytes in user32.OpenClipboard(0)
     try:  # Python 2
         if not isinstance(text, unicode):
             text = text.decode('mbcs')
     except NameError:
         if not isinstance(text, str):
             text = text.decode('mbcs')
-    d.user32.OpenClipboard(None)
+
+    try:
+        d.user32.OpenClipboard(None) # Works on Python 3
+    except ctypes.ArgumentError:
+        d.user32.OpenClipboard(0) # Works on Python 2
+
     d.user32.EmptyClipboard()
     hCd = d.kernel32.GlobalAlloc(GMEM_DDESHARE, len(text.encode('utf-16-le')) + 2)
     pchData = d.kernel32.GlobalLock(hCd)
@@ -57,7 +65,7 @@ def _copyWindows(text):
 def _pasteCygwin():
     CF_UNICODETEXT = 13
     d = ctypes.cdll
-    d.user32.OpenClipboard(None)
+    d.user32.OpenClipboard(0)
     handle = d.user32.GetClipboardData(CF_UNICODETEXT)
     data = ctypes.c_wchar_p(handle).value
     d.user32.CloseClipboard()
@@ -74,7 +82,7 @@ def _copyCygwin(text):
     except NameError:
         if not isinstance(text, str):
             text = text.decode('mbcs')
-    d.user32.OpenClipboard(None)
+    d.user32.OpenClipboard(0)
     d.user32.EmptyClipboard()
     hCd = d.kernel32.GlobalAlloc(GMEM_DDESHARE, len(text.encode('utf-16-le')) + 2)
     pchData = d.kernel32.GlobalLock(hCd)

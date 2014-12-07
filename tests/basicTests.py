@@ -3,7 +3,7 @@ import random
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import pyperclip
 
 class TestCopyPaste(unittest.TestCase):
@@ -16,7 +16,7 @@ class TestCopyPaste(unittest.TestCase):
 
     def test_randomCopyPaste(self):
         # This random version of the test_copyPaste() test is so that previous text on the clipboard does not cause a false positive.
-
+        random.seed = 42
         msg = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890' * 3)
         random.shuffle(msg)
         msg = ''.join(msg)
