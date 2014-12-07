@@ -1,3 +1,4 @@
+v1.5.7, 2014/12/07 -- Bug fix for issue 10 (calling OpenClipboard on Windows with wrong argument.)
 v1.5.6, 2014/12/05 -- Corrections for copying on Windows.
 v1.5.5, 2014/12/04 -- Bug fix for unicode on Windows.
 v1.5.4, 2014/09/09 -- Undoing OS X paste() bug fix because it requires 2.7, breaks pre2.7 versions.
