@@ -131,7 +131,7 @@ def _copyQt(text):
 
 
 def _copyXclip(text):
-    p = Popen(['xclip', '-selection', 'c'], stdin=PIPE)
+    p = Popen(['xclip', '-selection', 'c'], stdin=PIPE, close_fds=True)
     try:
         # works on Python 3 (bytes() requires an encoding)
         p.communicate(input=bytes(text, 'utf-8'))
@@ -141,7 +141,7 @@ def _copyXclip(text):
 
 
 def _pasteXclip():
-    p = Popen(['xclip', '-selection', 'c', '-o'], stdout=PIPE)
+    p = Popen(['xclip', '-selection', 'c', '-o'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     return bytes.decode(stdout)
 
