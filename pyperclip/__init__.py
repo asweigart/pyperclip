@@ -94,7 +94,7 @@ def _copyCygwin(text):
 
 def _copyOSX(text):
     text = str(text)
-    p = Popen(['pbcopy', 'w'], stdin=PIPE)
+    p = Popen(['pbcopy', 'w'], stdin=PIPE, close_fds=True)
     try:
         # works on Python 3 (bytes() requires an encoding)
         p.communicate(input=bytes(text, 'utf-8'))
@@ -104,7 +104,7 @@ def _copyOSX(text):
 
 
 def _pasteOSX():
-    p = Popen(['pbpaste', 'r'], stdout=PIPE)
+    p = Popen(['pbpaste', 'r'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     return bytes.decode(stdout)
 
@@ -147,7 +147,7 @@ def _pasteXclip():
 
 
 def _copyXsel(text):
-    p = Popen(['xsel', '-i'], stdin=PIPE)
+    p = Popen(['xsel', '-b', '-i'], stdin=PIPE, close_fds=True)
     try:
         # works on Python 3 (bytes() requires an encoding)
         p.communicate(input=bytes(text, 'utf-8'))
@@ -157,7 +157,7 @@ def _copyXsel(text):
 
 
 def _pasteXsel():
-    p = Popen(['xsel', '-o'], stdout=PIPE)
+    p = Popen(['xsel', '-b', '-o'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
     return bytes.decode(stdout)
 
