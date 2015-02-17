@@ -5,12 +5,11 @@ from setuptools import setup
 # Dynamically calculate the version based on pyperclip.VERSION.
 setup(
     name='pyperclip',
-    version='1.5.8',
+    version='1.5.9',
     url='https://github.com/asweigart/pyperclip',
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
-    description=('A cross-platform module for GUI automation for human beings. '
-                 'Control the keyboard and mouse from a Python script.'),
+    description=('A cross-platform clipboard module for Python. (only handles plain text for now)'),
     license='BSD',
     packages=['pyperclip'],
     test_suite='tests',

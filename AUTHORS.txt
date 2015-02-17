@@ -9,7 +9,7 @@ Chris Clark
 Edd Barrett https://github.com/vext01
 Marcelo Glezer https://github.com/gato
 Maximilian Hils https://github.com/mhils
-Nikolaos-Digenis Karagiannis
+Nikolaos-Digenis Karagiannis https://github.com/Digenis
 Stefan Scherfke https://github.com/sscherfke
 Steve Elam
 ZEDGR https://github.com/ZEDGR
