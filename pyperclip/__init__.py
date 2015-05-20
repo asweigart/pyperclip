@@ -91,7 +91,7 @@ def _copyOSX(text):
 def _pasteOSX():
     p = Popen(['pbpaste', 'r'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
-    return bytes.decode(stdout)
+    return stdout.decode('utf-8')
 
 
 def _pasteGtk():
@@ -123,7 +123,7 @@ def _copyXclip(text):
 def _pasteXclip():
     p = Popen(['xclip', '-selection', 'c', '-o'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
-    return bytes.decode(stdout)
+    return stdout.decode('utf-8')
 
 
 def _copyXsel(text):
@@ -134,7 +134,7 @@ def _copyXsel(text):
 def _pasteXsel():
     p = Popen(['xsel', '-b', '-o'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
-    return bytes.decode(stdout)
+    return stdout.decode('utf-8')
 
 
 
