@@ -4,6 +4,7 @@ answer newbie questions, and generally made Pyperclip that much better:
 
 Al Sweigart
 Alexander Cobleigh ‏@cblgh
+Anton Yakutovich https://github.com/drakulavich
 Cees Timmerman https://github.com/CTimmerman
 Chris Clark
 Edd Barrett https://github.com/vext01

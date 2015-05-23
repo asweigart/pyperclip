@@ -1,3 +1,4 @@
+v1.5.10, 2015/05/22 -- Fixed pasting from xsel and on mac.
 v1.5.9, 2015/02/17 -- Refactoring for Python 2/3 compatibility.
 v1.5.8, 2015/02/05 -- Bug fixes. xsel: copy to clipboard, don't inherit fds, fds closes for xclip
 v1.5.7, 2014/12/07 -- Bug fix for issue 10 (calling OpenClipboard on Windows with wrong argument.)

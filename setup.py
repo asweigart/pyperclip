@@ -5,7 +5,7 @@ from setuptools import setup
 # Dynamically calculate the version based on pyperclip.VERSION.
 setup(
     name='pyperclip',
-    version='1.5.9',
+    version='1.5.10',
     url='https://github.com/asweigart/pyperclip',
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
