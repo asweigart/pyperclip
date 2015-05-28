@@ -83,7 +83,6 @@ def _copyCygwin(text):
 
 
 def _copyOSX(text):
-    text = str(text)
     p = Popen(['pbcopy', 'w'], stdin=PIPE, close_fds=True)
     p.communicate(input=text.encode('utf-8'))
 
@@ -100,7 +99,6 @@ def _pasteGtk():
 
 def _copyGtk(text):
     global cb
-    text = str(text)
     cb = gtk.Clipboard()
     cb.set_text(text)
     cb.store()
@@ -111,7 +109,6 @@ def _pasteQt():
 
 
 def _copyQt(text):
-    text = str(text)
     cb.setText(text)
 
 
