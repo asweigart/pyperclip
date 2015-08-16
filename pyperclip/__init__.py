@@ -195,7 +195,7 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         _functions = 'xclip command' # for debugging
         paste = _pasteXclip
         copy = _copyXclip
-    elif xklipperExists: # Sadly dbus only supports Python 2 currently
+    elif xklipperExists:
         _functions = '(KDE Klipper) - qdbus (external)' # for debugging
         paste = _pasteKlipper
         copy = _copyKlipper
