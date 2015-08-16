@@ -20,7 +20,7 @@ The gtk module is not available for Python 3, and this module does not work with
 
 __version__ = '1.5.11'
 
-import platform, os, dbus
+import platform, os
 from subprocess import call, Popen, PIPE
 
 
@@ -134,16 +134,16 @@ def _pasteXsel():
     return stdout.decode('utf-8')
 
 def _copyKlipper(text):
-    bus = dbus.SessionBus()
-    proxy = bus.get_object('org.kde.klipper', '/klipper')
-    interface = dbus.Interface(proxy, 'org.kde.klipper.klipper')
-    interface.setClipboardContents(text.encode('utf-8'))
+    p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
+            'setClipboardContents', text.encode('utf-8')],
+             stdin=PIPE, close_fds=True)
+    p.communicate(input=None)
 
 def _pasteKlipper():
-    bus = dbus.SessionBus()
-    proxy = bus.get_object('org.kde.klipper', '/klipper')
-    interface = dbus.Interface(proxy, 'org.kde.klipper.klipper')
-    return interface.getClipboardContents()
+    p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
+            'getClipboardContents'], stdout=PIPE, close_fds=True)
+    stdout, stderr = p.communicate()
+    return stdout.decode('utf-8').strip()
 
 # Determine the OS/platform and set the copy() and paste() functions accordingly.
 if 'cygwin' in platform.system().lower():
@@ -168,8 +168,9 @@ elif os.name == 'posix' or platform.system() == 'Linux':
     xselExists = call(['which', 'xsel'],
             stdout=PIPE, stderr=PIPE) == 0
 
-    xklipperExists = call(['which', 'klipper'],
-            stdout=PIPE, stderr=PIPE) == 0
+    xklipperExists = (call(['which', 'klipper'],
+            stdout=PIPE, stderr=PIPE) == 0 and
+            call(['which', 'qdbus'], stdout=PIPE, stderr=PIPE) == 0)
 
     gtkInstalled = False
     try:
@@ -194,8 +195,8 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         _functions = 'xclip command' # for debugging
         paste = _pasteXclip
         copy = _copyXclip
-    elif xklipperExists and PY2: # Sadly dbus only supports Python 2 currently
-        _functions = '(KDE Klipper) - dbus module' # for debugging
+    elif xklipperExists: # Sadly dbus only supports Python 2 currently
+        _functions = '(KDE Klipper) - qdbus (external)' # for debugging
         paste = _pasteKlipper
         copy = _copyKlipper
     elif gtkInstalled:
