@@ -20,7 +20,7 @@ The gtk module is not available for Python 3, and this module does not work with
 
 __version__ = '1.5.11'
 
-import platform, os
+import platform, os, dbus
 from subprocess import call, Popen, PIPE
 
 
@@ -133,7 +133,17 @@ def _pasteXsel():
     stdout, stderr = p.communicate()
     return stdout.decode('utf-8')
 
+def _copyKlipper(text):
+    bus = dbus.SessionBus()
+    proxy = bus.get_object('org.kde.klipper', '/klipper')
+    interface = dbus.Interface(proxy, 'org.kde.klipper.klipper')
+    interface.setClipboardContents(text.encode('utf-8'))
 
+def _pasteKlipper():
+    bus = dbus.SessionBus()
+    proxy = bus.get_object('org.kde.klipper', '/klipper')
+    interface = dbus.Interface(proxy, 'org.kde.klipper.klipper')
+    return interface.getClipboardContents()
 
 # Determine the OS/platform and set the copy() and paste() functions accordingly.
 if 'cygwin' in platform.system().lower():
@@ -156,6 +166,9 @@ elif os.name == 'posix' or platform.system() == 'Linux':
                 stdout=PIPE, stderr=PIPE) == 0
 
     xselExists = call(['which', 'xsel'],
+            stdout=PIPE, stderr=PIPE) == 0
+
+    xklipperExists = call(['which', 'klipper'],
             stdout=PIPE, stderr=PIPE) == 0
 
     gtkInstalled = False
@@ -181,6 +194,10 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         _functions = 'xclip command' # for debugging
         paste = _pasteXclip
         copy = _copyXclip
+    elif xklipperExists:
+        _functions = '(KDE Klipper) - dbus module' # for debugging
+        paste = _pasteKlipper
+        copy = _copyKlipper
     elif gtkInstalled:
         _functions = 'gtk module' # for debugging
         paste = _pasteGtk
