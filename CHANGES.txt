@@ -1,3 +1,4 @@
+v1.5.12, 2015/09/18 -- Added _pasteKlipper() & _copyKlipper(). Thanks contrixed!
 v1.5.11, 2015/06/01 -- remove str() from _copy functions. Fix for ascii default encoding
 v1.5.10, 2015/05/22 -- Fixed pasting from xsel and on mac.
 v1.5.9, 2015/02/17 -- Refactoring for Python 2/3 compatibility.
