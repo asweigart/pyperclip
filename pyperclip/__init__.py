@@ -133,7 +133,17 @@ def _pasteXsel():
     stdout, stderr = p.communicate()
     return stdout.decode('utf-8')
 
+def _copyKlipper(text):
+    p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
+            'setClipboardContents', text.encode('utf-8')],
+             stdin=PIPE, close_fds=True)
+    p.communicate(input=None)
 
+def _pasteKlipper():
+    p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
+            'getClipboardContents'], stdout=PIPE, close_fds=True)
+    stdout, stderr = p.communicate()
+    return stdout.decode('utf-8').strip()
 
 # Determine the OS/platform and set the copy() and paste() functions accordingly.
 if 'cygwin' in platform.system().lower():
@@ -158,6 +168,10 @@ elif os.name == 'posix' or platform.system() == 'Linux':
     xselExists = call(['which', 'xsel'],
             stdout=PIPE, stderr=PIPE) == 0
 
+    xklipperExists = (call(['which', 'klipper'],
+            stdout=PIPE, stderr=PIPE) == 0 and
+            call(['which', 'qdbus'], stdout=PIPE, stderr=PIPE) == 0)
+
     gtkInstalled = False
     try:
         # Check it gtk is installed.
@@ -181,6 +195,10 @@ elif os.name == 'posix' or platform.system() == 'Linux':
         _functions = 'xclip command' # for debugging
         paste = _pasteXclip
         copy = _copyXclip
+    elif xklipperExists:
+        _functions = '(KDE Klipper) - qdbus (external)' # for debugging
+        paste = _pasteKlipper
+        copy = _copyKlipper
     elif gtkInstalled:
         _functions = 'gtk module' # for debugging
         paste = _pasteGtk
