@@ -143,7 +143,7 @@ def _pasteKlipper():
     p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
             'getClipboardContents'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
-    return stdout.decode('utf-8').strip()
+    return stdout.decode('utf-8')
 
 # Determine the OS/platform and set the copy() and paste() functions accordingly.
 if 'cygwin' in platform.system().lower():
