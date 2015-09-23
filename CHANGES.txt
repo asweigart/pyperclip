@@ -1,3 +1,4 @@
+v1.5.13, 2015/09/23 -- Added other python versions to the setup.py file.
 v1.5.12, 2015/09/18 -- Added _pasteKlipper() & _copyKlipper(). Thanks contrixed!
 v1.5.11, 2015/06/01 -- remove str() from _copy functions. Fix for ascii default encoding
 v1.5.10, 2015/05/22 -- Fixed pasting from xsel and on mac.

@@ -5,7 +5,7 @@ from setuptools import setup
 # Dynamically calculate the version based on pyperclip.VERSION.
 setup(
     name='pyperclip',
-    version='1.5.12',
+    version='1.5.13',
     url='https://github.com/asweigart/pyperclip',
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
@@ -24,8 +24,13 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.1',
+        'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
     ],
 )
