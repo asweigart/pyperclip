@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 import random
 import sys
@@ -5,6 +7,9 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import pyperclip
+
+import platform
+RUNNING_PY2 = '2' == platform.python_version_tuple()[0]
 
 class TestCopyPaste(unittest.TestCase):
     def test_copyPaste(self):
@@ -22,6 +27,14 @@ class TestCopyPaste(unittest.TestCase):
         msg = ''.join(msg)
         pyperclip.copy(msg)
         self.assertEqual(pyperclip.paste(), msg)
+
+    def test_copyUnicode(self):
+        pyperclip.copy('ಠ_ಠ')
+
+    def test_pasteUnicode(self):
+        if not RUNNING_PY2: # TODO: Can't get this test to work right under Python 2.
+            pyperclip.copy('ಠ_ಠ')
+            self.assertEqual(pyperclip.paste(), 'ಠ_ಠ')
 
 if __name__ == '__main__':
     unittest.main()

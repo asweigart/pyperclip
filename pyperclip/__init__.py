@@ -18,7 +18,7 @@ On Linux, this module makes use of the xclip or xsel commands, which should come
 The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
 """
 
-__version__ = '1.5.13'
+__version__ = '1.5.14'
 
 import platform, os
 from subprocess import call, Popen, PIPE
@@ -31,7 +31,7 @@ text_type = unicode if PY2 else str
 def _pasteWindows():
     CF_UNICODETEXT = 13
     d = ctypes.windll
-    d.user32.OpenClipboard(0 if PY2 else None)
+    d.user32.OpenClipboard(0)
     handle = d.user32.GetClipboardData(CF_UNICODETEXT)
     data = ctypes.c_wchar_p(handle).value
     d.user32.CloseClipboard()
@@ -45,7 +45,7 @@ def _copyWindows(text):
     if not isinstance(text, text_type):
         text = text.decode('mbcs')
 
-    d.user32.OpenClipboard(0 if PY2 else None)
+    d.user32.OpenClipboard(0)
 
     d.user32.EmptyClipboard()
     hCd = d.kernel32.GlobalAlloc(GMEM_DDESHARE, len(text.encode('utf-16-le')) + 2)
