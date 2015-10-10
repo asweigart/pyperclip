@@ -141,6 +141,8 @@ def _copyQt(text):
 
 
 def _copyXclip(text):
+    if not isinstance(text, STRING_FUNCTION):
+        text = text.decode('utf-8')
     p = Popen(['xclip', '-selection', 'c'], stdin=PIPE, close_fds=True)
     p.communicate(input=text.encode('utf-8'))
 
@@ -152,6 +154,8 @@ def _pasteXclip():
 
 
 def _copyXsel(text):
+    if not isinstance(text, STRING_FUNCTION):
+        text = text.decode('utf-8')
     p = Popen(['xsel', '-b', '-i'], stdin=PIPE, close_fds=True)
     p.communicate(input=text.encode('utf-8'))
 
@@ -163,6 +167,8 @@ def _pasteXsel():
 
 
 def _copyKlipper(text):
+    if not isinstance(text, STRING_FUNCTION):
+        text = text.decode('utf-8')
     p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
             'setClipboardContents', text.encode('utf-8')],
              stdin=PIPE, close_fds=True)
