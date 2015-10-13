@@ -18,7 +18,7 @@ On Linux, this module makes use of the xclip or xsel commands, which should come
 The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
 """
 
-__version__ = '1.5.14'
+__version__ = '1.5.15'
 
 import platform, os
 from subprocess import call, Popen, PIPE
@@ -50,6 +50,11 @@ def _copyWindows(text):
     d.user32.EmptyClipboard()
     hCd = d.kernel32.GlobalAlloc(GMEM_DDESHARE, len(text.encode('utf-16-le')) + 2)
     pchData = d.kernel32.GlobalLock(hCd)
+
+    # Detects this error: "OSError: exception: access violation writing 0x0000000000000000"
+    #if pchData == 0:
+    #    assert False, 'GlobalLock() returned NULL. GetLastError() returned' + str(ctypes.GetLastError())
+
     ctypes.cdll.msvcrt.wcscpy(ctypes.c_wchar_p(pchData), text)
     d.kernel32.GlobalUnlock(hCd)
     d.user32.SetClipboardData(CF_UNICODETEXT, hCd)
