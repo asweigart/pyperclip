@@ -28,6 +28,38 @@ PY2 = '2' == platform.python_version_tuple()[0]
 text_type = unicode if PY2 else str
 
 
+def _setWindowsArgs():
+    import ctypes.wintypes as wt
+    
+    u32 = ctypes.windll.user32
+    
+    u32.OpenClipboard.restype = wt.BOOL
+    u32.OpenClipboard.argtypes = [wt.HWND]
+    
+    u32.EmptyClipboard.restype = wt.BOOL
+    u32.EmptyClipboard.argtypes = []
+    
+    u32.SetClipboardData.restype = wt.HANDLE
+    u32.SetClipboardData.argtypes = [wt.UINT, wt.HANDLE]
+    
+    u32.GetClipboardData.restype = wt.HANDLE
+    u32.GetClipboardData.argtypes = [wt.UINT]
+    
+    u32.CloseClipboard.restype = wt.BOOL
+    u32.CloseClipboard.argtypes = []
+
+    k32 = ctypes.windll.kernel32
+
+    k32.GlobalAlloc.restype = wt.HGLOBAL
+    k32.GlobalAlloc.argtypes = [wt.UINT, ctypes.c_void_p]
+
+    k32.GlobalLock.restype = wt.LPVOID
+    k32.GlobalLock.argtypes = [wt.HGLOBAL]
+
+    k32.GlobalUnlock.restype = wt.BOOL
+    k32.GlobalUnlock.argtypes = [wt.HGLOBAL]
+
+
 def _pasteWindows():
     CF_UNICODETEXT = 13
     d = ctypes.windll
@@ -159,6 +191,7 @@ if 'cygwin' in platform.system().lower():
 elif os.name == 'nt' or platform.system() == 'Windows':
     _functions = 'Windows' # for debugging
     import ctypes
+    _setWindowsArgs()
     paste = _pasteWindows
     copy = _copyWindows
 elif os.name == 'mac' or platform.system() == 'Darwin':
