@@ -60,6 +60,47 @@ def _copyWindows(text):
     d.user32.SetClipboardData(CF_UNICODETEXT, hCd)
     d.user32.CloseClipboard()
 
+def _paste_as_htmlWindows(format='HTML Format'):
+    """
+    Get Clipboard data in HTML Format, if available
+
+    possible formats are:
+        "HTML Format" - utf-8 byte code with much info and context, all browsers
+            https://msdn.microsoft.com/en-us/library/aa767917%28v=vs.85%29.aspx
+    Mozilla extensions:
+        "text/html" - only the selected text in html
+        "text/_moz_htmlcontext" - info and context looks like html
+        "text/x-moz-url-priv" - the URL
+    These three simple clipboard formats allow to get the same information easier
+    """
+    d = ctypes.windll
+    wu = d.user32
+    if not format in ('HTML Format', 'text/html',
+                      'text/_moz_htmlcontext', 'text/x-moz-url-priv'):
+        raise NameError("Unknown value of format parameter")
+    if not d.user32.OpenClipboard(0):
+        raise OSError("Clipboard is locked by other app")
+    data = None
+    u_format = wu.EnumClipboardFormats(None)
+    while u_format:
+        buf = ctypes.create_unicode_buffer(100)
+        _st_len = wu.GetClipboardFormatNameW(u_format, ctypes.byref(buf), len(buf))
+        if buf.value == format:
+            handle = d.user32.GetClipboardData(u_format)
+            if buf.value == 'HTML Format':
+                data = ctypes.c_char_p(handle).value
+            else:
+                data = ctypes.c_wchar_p(handle).value
+            size = d.kernel32.GlobalSize(handle)
+            #break
+            #if u_format == 49161:
+            #    print('\n\n*** %d %d' % (u_format, _st_len), buf.value, size, '\n', [ord(x) for x in data])
+            #else:
+            #    print('\n\n*** %d %d' % (u_format, _st_len), buf.value, size, '\n', repr(data))
+        u_format = wu.EnumClipboardFormats(u_format)
+    wu.CloseClipboard()
+    return data
+
 
 def _pasteCygwin():
     CF_UNICODETEXT = 13
@@ -161,6 +202,7 @@ elif os.name == 'nt' or platform.system() == 'Windows':
     import ctypes
     paste = _pasteWindows
     copy = _copyWindows
+    paste_as_html = _paste_as_htmlWindows
 elif os.name == 'mac' or platform.system() == 'Darwin':
     _functions = 'OS X pbcopy/pbpaste' # for debugging
     paste = _pasteOSX
