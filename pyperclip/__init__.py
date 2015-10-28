@@ -20,12 +20,63 @@ The gtk module is not available for Python 3, and this module does not work with
 
 __version__ = '1.5.16'
 
-import platform, os
+import platform, os, re
 from subprocess import call, Popen, PIPE
 
 
 PY2 = '2' == platform.python_version_tuple()[0]
 text_type = unicode if PY2 else str
+
+
+class HtmlClipboard(object):
+    """
+    Parsed clipboard from the raw byte string "HTML Format" clipboard
+    """
+    def __init__(self, raw):
+        def read_value(name):
+            match = re.search(r'\s{0}:(\d+)\s'.format(name), raw)
+            return int(match.groups()[0])
+        self.raw = raw
+        self.header = {}
+        start = read_value('StartHTML')
+        if start == -1:
+            start = read_value('StartFragment')
+        for line in raw[:start].splitlines():
+            key, val = line.split(':', 1)
+            self.header[key] = int(val) if val.isdigit() else val
+        if not 'StartSelection' in self.header:
+            self.header['StartSelection'] = self.header['StartFragment']
+            self.header['EndSelection'] = self.header['EndFragment']
+
+    @property
+    def html(self):
+        "The selection plus all parent tags and the head"
+        return self.raw[self.header['StartHTML']:self.header['EndHTML']].decode('utf-8')
+
+    @property
+    def fragment(self):
+        "The Selection plus added opening and closing tags"
+        return self.raw[self.header['StartFragment']:self.header['EndFragment']].decode('utf-8')
+
+    @property
+    def selection(self):
+        "The copied selection"
+        return self.raw[self.header['StartSelection']:self.header['EndSelection']].decode('utf-8')
+
+    @property
+    def source(self):
+        "Source URL"
+        return self.header.get('SourceURL')
+
+    if PY2:
+        def __str__(self):
+            return self.fragment.encode('utf-8')
+
+        def __unicode__(self):
+            return self.fragment
+    else:
+        def __str__(self):
+            return self.fragment
 
 
 def _pasteWindows():
@@ -59,6 +110,47 @@ def _copyWindows(text):
     d.kernel32.GlobalUnlock(hCd)
     d.user32.SetClipboardData(CF_UNICODETEXT, hCd)
     d.user32.CloseClipboard()
+
+def _paste_as_htmlWindows():
+    """
+    Get Clipboard data in the HTML Format, if available
+
+    It is supported by: All web browsers, MS Office and many other software.
+
+    Properties:
+        html
+            The selection plus all parent tags and the head
+        fragment
+            The Selection plus added opening and closing tags
+        selection
+            "The copied selection
+        source
+            Source URL (optional)
+
+        raw
+            The raw clipboard data in the "HTML Format" as described in
+            https://msdn.microsoft.com/en-us/library/aa767917%28v=vs.85%29.aspx
+    """
+    d = ctypes.windll
+    wu = d.user32
+    if not d.user32.OpenClipboard(0):
+        raise OSError("Clipboard is locked by other app")
+    data = None
+    u_format = wu.EnumClipboardFormats(None)
+    while u_format:
+        buf = ctypes.create_unicode_buffer(100)
+        _st_len = wu.GetClipboardFormatNameW(u_format, ctypes.byref(buf), len(buf))
+        if buf.value == 'HTML Format':
+            handle = d.user32.GetClipboardData(u_format)
+            size = d.kernel32.GlobalSize(handle)
+            data = ctypes.c_char_p(handle).value
+            # The data from web browsers are null terminated but not from ms office,
+            # so it is size or size-1 characters long.
+            data = HtmlClipboard(data[:size])
+            break
+        u_format = wu.EnumClipboardFormats(u_format)
+    wu.CloseClipboard()
+    return data
 
 
 def _pasteCygwin():
@@ -173,6 +265,7 @@ elif os.name == 'nt' or platform.system() == 'Windows':
     import ctypes
     paste = _pasteWindows
     copy = _copyWindows
+    paste_as_html = _paste_as_htmlWindows
 elif os.name == 'mac' or platform.system() == 'Darwin':
     _functions = 'OS X pbcopy/pbpaste' # for debugging
     paste = _pasteOSX
