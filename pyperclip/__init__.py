@@ -148,7 +148,19 @@ def _pasteKlipper():
     p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
             'getClipboardContents'], stdout=PIPE, close_fds=True)
     stdout, stderr = p.communicate()
-    return stdout.decode('utf-8')
+
+    # Apparently Klipper has a bug that adds a newline to the end. It was reported in Klipper version 0.20.3 but I've
+    # seen it in 0.9.7. The bug is unfixed. This function will remove a newline if the string has one.
+    # TODO: In the future, once Klipper is fixed, check the version number to decided whether or not to strip the
+    # newline.
+    # https://bugs.kde.org/show_bug.cgi?id=342874
+
+    clipboardContents = stdout.decode('utf-8')
+    assert len(clipboardContents) > 0 # even if blank, Klipper will append a newline at the end
+    assert clipboardContents[-1] == '\n' # make sure that newline is there
+    if len(clipboardContents) and clipboardContents[-1] == '\n':
+        clipboardContents = clipboardContents[:-1]
+    return clipboardContents
 
 # Determine the OS/platform and set the copy() and paste() functions accordingly.
 if 'cygwin' in platform.system().lower():
