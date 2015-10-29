@@ -28,7 +28,7 @@ NOTE: The _functions variable contains a string describing which copy/paste func
     - xsel command
 """
 
-__version__ = '1.5.17'
+__version__ = '1.5.18'
 
 import platform, os
 from subprocess import call, Popen, PIPE
