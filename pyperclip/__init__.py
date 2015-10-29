@@ -180,11 +180,7 @@ def _pasteKlipper():
     # newline.
     # https://bugs.kde.org/show_bug.cgi?id=342874
 
-    clipboardContents = stdout.decode('utf-8')
-    assert len(clipboardContents) > 0 # even if blank, Klipper will append a newline at the end
-    assert clipboardContents[-1] == '\n' # make sure that newline is there
-    if len(clipboardContents) and clipboardContents[-1] == '\n':
-        clipboardContents = clipboardContents[:-1]
+    clipboardContents = stdout.decode('utf-8').rstrip('\n')
     return clipboardContents
 
 
