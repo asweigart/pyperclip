@@ -118,7 +118,11 @@ def _pasteOSX():
 
 
 def _pasteGtk():
-    return gtk.Clipboard().wait_for_text()
+    clipboardContents = gtk.Clipboard().wait_for_text() # for python 2, returns None if the clipboard is blank.
+    if clipboardContents is None:
+        return ''
+    else:
+        return clipboardContents
 
 
 def _copyGtk(text):
