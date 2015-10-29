@@ -163,26 +163,43 @@ def _pasteXsel():
 
 
 def _copyKlipper(text):
+    if text is '':
+        return
+ 
     p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
             'setClipboardContents', text.encode('utf-8')],
              stdin=PIPE, close_fds=True)
     p.communicate(input=None)
 
-
 def _pasteKlipper():
     p = Popen(['qdbus', 'org.kde.klipper', '/klipper',
             'getClipboardContents'], stdout=PIPE, close_fds=True)
+    
+    # Obtain the version from the cli bin.
+    version = Popen(['klipper', '--version'], stdout=PIPE, close_fds=True)
+    
+    version = version.communicate(input=None)
+    version = version[0]
+    version = version[8:] # Remove klipper from the string.
+    version = version[:-1] # Remove \n from the string.
+        
     stdout, stderr = p.communicate()
+    
+    if version == '0.20.3' or version == '0.9.7':
+        return self._klipper_fix_newline(stdout.decode('utf-8'))
 
+    return stdout.decode('utf-8')
+
+def _klipper_fix_newline(text):
     # Apparently Klipper has a bug that adds a newline to the end. It was reported in Klipper version 0.20.3 but I've
     # seen it in 0.9.7. The bug is unfixed. This function will remove a newline if the string has one.
     # TODO: In the future, once Klipper is fixed, check the version number to decided whether or not to strip the
     # newline.
     # https://bugs.kde.org/show_bug.cgi?id=342874
 
-    clipboardContents = stdout.decode('utf-8')
-    assert len(clipboardContents) > 0 # even if blank, Klipper will append a newline at the end
-    assert clipboardContents[-1] == '\n' # make sure that newline is there
+    clipboardContents = text
+    #assert len(clipboardContents) > 0 # even if blank, Klipper will append a newline at the end
+    #assert clipboardContents[-1] == '\n' # make sure that newline is there
     if len(clipboardContents) and clipboardContents[-1] == '\n':
         clipboardContents = clipboardContents[:-1]
     return clipboardContents
