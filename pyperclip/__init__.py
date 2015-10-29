@@ -208,8 +208,8 @@ def setFunctions(functionSet):
                 stdout=PIPE, stderr=PIPE) == 0
         assert xselExists, 'The xsel command could not be found.'
     elif functionSet == KLIPPER:
-        copy = _copyXsel
-        paste = _pasteXsel
+        copy = _copyKlipper
+        paste = _pasteKlipper
     elif functionSet == PYQT4:
         import PyQt4.QtCore
         import PyQt4.QtGui
