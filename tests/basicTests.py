@@ -12,6 +12,16 @@ from pyperclip import CYGWIN, WINDOWS, PBCOPY_PBPASTE, XCLIP, XSEL, KLIPPER, PYQ
 import platform
 RUNNING_PY2 = '2' == platform.python_version_tuple()[0]
 
+ALL_FUNCTION_SETS = (CYGWIN, WINDOWS, PBCOPY_PBPASTE, XCLIP, XSEL, KLIPPER, PYQT4, GTK)
+
+# The user can specify which set of copy/paste functions to use instead of the default. The names are given as strings in OVERRIDE_FUNCTION_SET.
+OVERRIDE_FUNCTION_SET = None
+if len(sys.argv) > 1:
+    OVERRIDE_FUNCTION_SET = sys.argv[1]
+    assert OVERRIDE_FUNCTION_SET in ALL_FUNCTION_SETS, 'Function set specified must be one of: %s' % (ALL_FUNCTION_SETS)
+
+if OVERRIDE_FUNCTION_SET is not None:
+    pyperclip.setFunctions(OVERRIDE_FUNCTION_SET)
 
 class TestCopyPaste(unittest.TestCase):
     def test_copyPaste(self):
@@ -46,7 +56,7 @@ class TestCopyPaste(unittest.TestCase):
 
 class TestFunctionSets(unittest.TestCase):
     def test_determineFunctionSet(self):
-        self.assertIn(pyperclip.determineFunctionSet(), (CYGWIN, WINDOWS, PBCOPY_PBPASTE, XCLIP, XSEL, KLIPPER, PYQT4, GTK))
+        self.assertIn(pyperclip.determineFunctionSet(), ALL_FUNCTION_SETS)
 
 
 if __name__ == '__main__':

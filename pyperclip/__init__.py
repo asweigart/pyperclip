@@ -187,6 +187,15 @@ def _pasteKlipper():
         clipboardContents = clipboardContents[:-1]
     return clipboardContents
 
+
+def _noCopy(text):
+    raise NotImplementedError('Pyperclip could not find a copy/paste mechanism for your system. Please see https://pyperclip.readthedocs.org for how to fix this.')
+
+
+def _noPaste():
+    raise NotImplementedError('Pyperclip could not find a copy/paste mechanism for your system. Please see https://pyperclip.readthedocs.org for how to fix this.')
+
+
 def setFunctions(functionSet):
     global copy, paste, _functions, app, cb, ctypes, PyQt4, gtk
 
@@ -225,6 +234,9 @@ def setFunctions(functionSet):
         import gtk
         copy = _copyGtk
         paste = _pasteGtk
+    elif functionSet is None:
+        copy = _noCopy
+        paste = _noPaste
     else:
         assert False, 'There is no function set called "%s".' % (functionSet)
 
@@ -272,9 +284,9 @@ def determineFunctionSet():
         if xklipperExists:
             return KLIPPER
 
-        raise RuntimeError('No clipboard software is installed. Install one of: gtk, PyQt4, xclip, xsel, or klipper')
+        return None # will set the functions to _noCopy and _noPaste
     else:
-        raise RuntimeError('pyperclip does not support your system.')
+        return None # will set the functions to _noCopy and _noPaste
 
 # Set the appropriate copy/paste functions
 setFunctions(determineFunctionSet())
