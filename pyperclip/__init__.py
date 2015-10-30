@@ -220,6 +220,8 @@ def setFunctions(functionSet):
         xselExists = call(['which', 'xsel'],
                 stdout=PIPE, stderr=PIPE) == 0
         assert xselExists, 'The xsel command could not be found.'
+        copy = _copyXsel
+        paste = _pasteXsel
     elif functionSet == KLIPPER:
         copy = _copyKlipper
         paste = _pasteKlipper
