@@ -28,7 +28,7 @@ NOTE: The _functions variable contains a string describing which copy/paste func
     - xsel command
 """
 
-__version__ = '1.5.18'
+__version__ = '1.5.19'
 
 import platform, os
 from subprocess import call, Popen, PIPE
@@ -189,11 +189,11 @@ def _pasteKlipper():
 
 
 def _noCopy(text):
-    raise NotImplementedError('Pyperclip could not find a copy/paste mechanism for your system. Please see https://pyperclip.readthedocs.org for how to fix this.')
+    raise RuntimeError('Pyperclip could not find a copy/paste mechanism for your system. Please see https://pyperclip.readthedocs.org for how to fix this.')
 
 
 def _noPaste():
-    raise NotImplementedError('Pyperclip could not find a copy/paste mechanism for your system. Please see https://pyperclip.readthedocs.org for how to fix this.')
+    raise RuntimeError('Pyperclip could not find a copy/paste mechanism for your system. Please see https://pyperclip.readthedocs.org for how to fix this.')
 
 
 def setFunctions(functionSet):
