@@ -8,6 +8,7 @@ Anton Yakutovich https://github.com/drakulavich
 Cees Timmerman https://github.com/CTimmerman
 Chris Clark
 Edd Barrett https://github.com/vext01
+hinlader https://github.com/hinlader
 Jonathan Slenders https://github.com/jonathanslenders
 Marcelo Glezer https://github.com/gato
 Maximilian Hils https://github.com/mhils
