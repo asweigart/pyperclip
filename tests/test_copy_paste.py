@@ -6,7 +6,8 @@ import os
 import platform
 from pyperclip import _executable_exists
 from pyperclip.clipboards import (init_gtk_clipboard, init_xsel_clipboard, init_xclip_clipboard, init_klipper_clipboard,
-                                  init_qt_clipboard, init_osx_clipboard, init_no_clipboard, init_windows_clipboard)
+                                  init_qt_clipboard, init_osx_clipboard, init_no_clipboard)
+from pyperclip.windows import init_windows_clipboard
 
 
 class _TestClipboard(unittest.TestCase):

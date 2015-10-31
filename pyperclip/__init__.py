@@ -25,8 +25,9 @@ __version__ = '1.5.20'
 import platform
 import os
 import subprocess
-from .clipboards import (init_windows_clipboard, init_gtk_clipboard, init_klipper_clipboard, init_osx_clipboard,
+from .clipboards import (init_gtk_clipboard, init_klipper_clipboard, init_osx_clipboard,
                          init_qt_clipboard, init_xclip_clipboard, init_xsel_clipboard, init_no_clipboard)
+from .windows import init_windows_clipboard
 
 PY2 = '2' == platform.python_version_tuple()[0]
 STRING_FUNCTION = unicode if PY2 else str
