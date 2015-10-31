@@ -10,32 +10,28 @@ Usage:
   pyperclip.copy('The text to be copied to the clipboard.')
   spam = pyperclip.paste()
 
+  if not pyperclip.copy:
+    print("Copy functionality unavailable!")
+
 On Windows, no additional modules are needed.
 On Mac, this module makes use of the pbcopy and pbpaste commands, which should come with the os.
 On Linux, this module makes use of the xclip or xsel commands, which should come with the os. Otherwise run "sudo apt-get install xclip" or "sudo apt-get install xsel"
   Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
 
 The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
-
-NOTE: The _functions variable contains a string describing which copy/paste functions are being used:
-    - Windows
-    - Cygwin
-    - OS X pbcopy/pbpaste
-    - xclip command
-    - (KDE Klipper) - qdbus (external)
-    - gtk module
-    - PyQt4 module
-    - xsel command
 """
+__version__ = '1.5.20'
 
-__version__ = '1.5.17'
-
-import platform, os
-from subprocess import call, Popen, PIPE
+import platform
+import os
+import subprocess
+from .clipboards import (init_windows_clipboard, init_gtk_clipboard, init_klipper_clipboard, init_osx_clipboard,
+                         init_qt_clipboard, init_xclip_clipboard, init_xsel_clipboard, init_no_clipboard)
 
 PY2 = '2' == platform.python_version_tuple()[0]
 STRING_FUNCTION = unicode if PY2 else str
 
+<<<<<<< HEAD
 # constants for copy/paste function types
 CYGWIN = 'cygwin'
 WINDOWS = 'windows'
@@ -246,52 +242,47 @@ def setFunctions(functionSet):
         assert False, 'There is no function set called "%s".' % (functionSet)
 
     _functions = functionSet
+=======
+>>>>>>> pyclipm/master
+
+def _executable_exists(name):
+    return subprocess.call(['which', name], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
-def determineFunctionSet():
-    global gtk, PyQt4
-
+def determine_clipboard():
     # Determine the OS/platform and set the copy() and paste() functions accordingly.
     if 'cygwin' in platform.system().lower():
-        return CYGWIN
-    elif os.name == 'nt' or platform.system() == 'Windows':
-        return WINDOWS
-    elif os.name == 'mac' or platform.system() == 'Darwin':
-        return PBCOPY_PBPASTE
-    elif os.name == 'posix' or platform.system() == 'Linux':
+        return init_windows_clipboard(cygwin=True)
+    if os.name == 'nt' or platform.system() == 'Windows':
+        return init_windows_clipboard()
+    if os.name == 'mac' or platform.system() == 'Darwin':
+        return init_osx_clipboard()
+    if (os.name == 'posix' or platform.system() == 'Linux') and "DISPLAY" in os.environ:
         # Determine which command/module is installed, if any.
         try:
             import gtk  # check if gtk is installed
-            return GTK
         except ImportError:
             pass
+        else:
+            return init_gtk_clipboard()
 
         try:
-            import PyQt4.QtCore # check if PyQt4 is installed
-            import PyQt4.QtGui
-            return PYQT4
+            import PyQt4  # check if PyQt4 is installed
         except ImportError:
             pass
+        else:
+            return init_qt_clipboard()
 
-        xclipExists = call(['which', 'xclip'],
-                    stdout=PIPE, stderr=PIPE) == 0
-        if xclipExists:
-            return XCLIP
+        if _executable_exists("xclip"):
+            return init_xclip_clipboard()
+        if _executable_exists("xsel"):
+            return init_xsel_clipboard()
+        if _executable_exists("klipper") and _executable_exists("qdbus"):
+            return init_klipper_clipboard()
 
-        xselExists = call(['which', 'xsel'],
-                stdout=PIPE, stderr=PIPE) == 0
-        if xselExists:
-            return XSEL
+    return init_no_clipboard()
 
-        xklipperExists = (call(['which', 'klipper'],
-                stdout=PIPE, stderr=PIPE) == 0 and
-                call(['which', 'qdbus'], stdout=PIPE, stderr=PIPE) == 0)
-        if xklipperExists:
-            return KLIPPER
 
-        raise RuntimeError('No clipboard software is installed. Install one of: gtk, PyQt4, xclip, xsel, or klipper')
-    else:
-        raise RuntimeError('pyperclip does not support your system.')
+copy, paste = determine_clipboard()
 
-# Set the appropriate copy/paste functions
-setFunctions(determineFunctionSet())
+__all__ = ["copy", "paste"]
