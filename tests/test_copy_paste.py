@@ -4,7 +4,7 @@ import unittest
 import random
 import os
 import platform
-from pyperclip import _executable_exists
+from pyperclip import _executable_exists, HAS_DISPLAY
 from pyperclip.clipboards import (init_gtk_clipboard, init_xsel_clipboard, init_xclip_clipboard, init_klipper_clipboard,
                                   init_qt_clipboard, init_osx_clipboard, init_no_clipboard, init_windows_clipboard)
 
@@ -72,6 +72,9 @@ class TestOSX(_TestClipboard):
 
 
 class TestGtk(_TestClipboard):
+    if not HAS_DISPLAY:
+        return
+
     try:
         import gtk
     except ImportError:
@@ -81,6 +84,9 @@ class TestGtk(_TestClipboard):
 
 
 class TestQt(_TestClipboard):
+    if not HAS_DISPLAY:
+        return
+
     try:
         import PyQt4
     except ImportError:

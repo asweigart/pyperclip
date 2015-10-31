@@ -31,6 +31,10 @@ from .clipboards import (init_windows_clipboard, init_gtk_clipboard, init_klippe
 PY2 = '2' == platform.python_version_tuple()[0]
 STRING_FUNCTION = unicode if PY2 else str
 
+# `import PyQt4` sys.exit()s if DISPLAY is not in the environment.
+# Thus, we need to detect the presence of $DISPLAY manually not not load PyQt4 if it is absent.
+HAS_DISPLAY = "DISPLAY" in os.environ or not (os.name == 'posix' or platform.system() == 'Linux')
+
 
 def _executable_exists(name):
     return subprocess.call(['which', name], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
@@ -44,7 +48,7 @@ def determine_clipboard():
         return init_windows_clipboard()
     if os.name == 'mac' or platform.system() == 'Darwin':
         return init_osx_clipboard()
-    if (os.name == 'posix' or platform.system() == 'Linux') and "DISPLAY" in os.environ:
+    if HAS_DISPLAY:
         # Determine which command/module is installed, if any.
         try:
             import gtk  # check if gtk is installed
