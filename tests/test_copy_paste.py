@@ -72,23 +72,27 @@ class TestOSX(_TestClipboard):
 
 
 class TestGtk(_TestClipboard):
-    if HAS_DISPLAY:
-        try:
-            import gtk
-        except ImportError:
-            pass
-        else:
-            clipboard = init_gtk_clipboard()
+    if not HAS_DISPLAY:
+        return
+
+    try:
+        import gtk
+    except ImportError:
+        pass
+    else:
+        clipboard = init_gtk_clipboard()
 
 
 class TestQt(_TestClipboard):
-    if HAS_DISPLAY:
-        try:
-            import PyQt4
-        except ImportError:
-            pass
-        else:
-            clipboard = init_qt_clipboard()
+    if not HAS_DISPLAY:
+        return
+
+    try:
+        import PyQt4
+    except ImportError:
+        pass
+    else:
+        clipboard = init_qt_clipboard()
 
 
 class TestXClip(_TestClipboard):
