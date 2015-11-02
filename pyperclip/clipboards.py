@@ -106,8 +106,8 @@ def init_klipper_clipboard():
 
         clipboardContents = stdout.decode('utf-8')
         assert len(clipboardContents) > 0  # even if blank, Klipper will append a newline at the end
-        assert clipboardContents[-1] == '\n'  # make sure that newline is there
-        if len(clipboardContents) and clipboardContents[-1] == '\n':
+        assert clipboardContents.endswith('\n')  # make sure that newline is there
+        if clipboardContents.endswith('\n'):
             clipboardContents = clipboardContents[:-1]
         return clipboardContents
 
