@@ -1,9 +1,13 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 import string
 import unittest
 import random
 import os
 import platform
+
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 from pyperclip import _executable_exists, HAS_DISPLAY
 from pyperclip.clipboards import (init_gtk_clipboard, init_xsel_clipboard, init_xclip_clipboard, init_klipper_clipboard,
                                   init_qt_clipboard, init_osx_clipboard, init_no_clipboard)
@@ -73,27 +77,23 @@ class TestOSX(_TestClipboard):
 
 
 class TestGtk(_TestClipboard):
-    if not HAS_DISPLAY:
-        return
-
-    try:
-        import gtk
-    except ImportError:
-        pass
-    else:
-        clipboard = init_gtk_clipboard()
+    if HAS_DISPLAY:
+        try:
+            import gtk
+        except ImportError:
+            pass
+        else:
+            clipboard = init_gtk_clipboard()
 
 
 class TestQt(_TestClipboard):
-    if not HAS_DISPLAY:
-        return
-
-    try:
-        import PyQt4
-    except ImportError:
-        pass
-    else:
-        clipboard = init_qt_clipboard()
+    if HAS_DISPLAY:
+        try:
+            import PyQt4
+        except ImportError:
+            pass
+        else:
+            clipboard = init_qt_clipboard()
 
 
 class TestXClip(_TestClipboard):

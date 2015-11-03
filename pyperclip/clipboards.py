@@ -83,9 +83,6 @@ def init_xsel_clipboard():
 
 def init_klipper_clipboard():
     def copy_klipper(text):
-        if text is '':
-            return
-
         p = subprocess.Popen(
             ['qdbus', 'org.kde.klipper', '/klipper', 'setClipboardContents', text.encode('utf-8')],
             stdin=subprocess.PIPE,
@@ -99,32 +96,23 @@ def init_klipper_clipboard():
             stdout=subprocess.PIPE,
             close_fds=True
         )
-        # Obtain the version from the cli bin.
-        version = Popen(['klipper', '--version'], stdout=PIPE, close_fds=True)
-    
-        version = version.communicate(input=None)
-        version = version[0]
-        version = version[8:] # Remove klipper from the string.
-        version = version[:-1] # Remove \n from the string.
-        
         stdout, stderr = p.communicate()
-    
-        if version == '0.20.3' or version == '0.9.7':
-            return _klipper_fix_newline(stdout.decode('utf-8'))
 
-        return stdout.decode('utf-8')
+        # Apparently Klipper has a bug that adds a newline to the end. It was reported in Klipper version 0.20.3 but I've
+        # seen it in 0.9.7. The bug is unfixed. This function will remove a newline if the string has one.
+        # TODO: In the future, once Klipper is fixed, check the version number to decided whether or not to strip the
+        # newline.
+        # https://bugs.kde.org/show_bug.cgi?id=342874
+
+        clipboardContents = stdout.decode('utf-8')
+        assert len(clipboardContents) > 0  # even if blank, Klipper will append a newline at the end
+        assert clipboardContents.endswith('\n')  # make sure that newline is there
+        if clipboardContents.endswith('\n'):
+            clipboardContents = clipboardContents[:-1]
+        return clipboardContents
+
 
     return copy_klipper, paste_klipper
-
-def _klipper_fix_newline(text):
-    # Apparently Klipper has a bug that adds a newline to the end. It was reported in Klipper version 0.20.3 but I've
-    # seen it in 0.9.7. The bug is unfixed. This function will remove a newline if the string has one.
-    # https://bugs.kde.org/show_bug.cgi?id=342874
-
-    clipboardContents = text
-    if len(clipboardContents) and clipboardContents[-1] == '\n':
-        clipboardContents = clipboardContents[:-1]
-    return clipboardContents
 
 
 def init_no_clipboard():
