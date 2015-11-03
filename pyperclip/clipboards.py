@@ -111,7 +111,6 @@ def init_klipper_clipboard():
             clipboardContents = clipboardContents[:-1]
         return clipboardContents
 
-
     return copy_klipper, paste_klipper
 
 
