@@ -8,10 +8,14 @@ import platform
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from pyperclip import _executable_exists, HAS_DISPLAY
-from pyperclip.clipboards import (init_gtk_clipboard, init_xsel_clipboard, init_xclip_clipboard, init_klipper_clipboard,
-                                  init_qt_clipboard, init_osx_clipboard, init_no_clipboard)
-from pyperclip.windows import init_windows_clipboard
+from pyperclip import _executable_exists, HAS_DISPLAY, MS_WINDOWS, UNIX
+
+if UNIX:
+    from pyperclip.clipboards import (init_gtk_clipboard, init_xsel_clipboard, init_xclip_clipboard, init_klipper_clipboard,
+                                      init_qt_clipboard, init_osx_clipboard, init_no_clipboard)
+
+if MS_WINDOWS:
+    from pyperclip.windows import init_windows_clipboard
 
 
 class _TestClipboard(unittest.TestCase):
