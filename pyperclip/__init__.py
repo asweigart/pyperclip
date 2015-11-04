@@ -26,15 +26,15 @@ import platform
 import os
 import subprocess
 
-MS_WINDOWS = platform.system() == 'Windows' or platform.system()[0:8] == 'CYGWIN_NT'
-UNIX = os.name == 'posix'
+IS_WINDOWS = platform.system() == 'Windows' or 'cygwin' in platform.system().lower()
+IS_UNIX = os.name == 'posix'
 
-if UNIX:
+if IS_UNIX:
     from .clipboards import (init_gtk_clipboard, init_klipper_clipboard, init_osx_clipboard,
                              init_qt_clipboard, init_xclip_clipboard, init_xsel_clipboard,
                              init_no_clipboard)
 
-if MS_WINDOWS:
+if IS_WINDOWS:
     from .windows import init_windows_clipboard
 
 PY2 = '2' == platform.python_version_tuple()[0]
