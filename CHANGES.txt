@@ -1,3 +1,4 @@
+v1.5.21, 2015/11/04 -- Import fixes.
 v1.5.20, 2015/10/30 -- Big refactoring and testing additions from mhils. Thanks!
 v1.5.19, 2015/10/29 -- Updating setup.py to pull version info from __init__.py
 v1.5.18, 2015/10/29 -- Added _noCopy/_noPaste functions to raise NotImplementedError exceptions when called, instead of raising exceptions when Pyperclip is imported.
