@@ -1,13 +1,21 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 import string
 import unittest
 import random
 import os
 import platform
-from pyperclip import _executable_exists, HAS_DISPLAY
-from pyperclip.clipboards import (init_gtk_clipboard, init_xsel_clipboard, init_xclip_clipboard, init_klipper_clipboard,
-                                  init_qt_clipboard, init_osx_clipboard, init_no_clipboard)
-from pyperclip.windows import init_windows_clipboard
+
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from pyperclip import _executable_exists, HAS_DISPLAY, IS_WINDOWS, IS_UNIX
+
+if IS_UNIX:
+    from pyperclip.clipboards import (init_gtk_clipboard, init_xsel_clipboard, init_xclip_clipboard, init_klipper_clipboard,
+                                      init_qt_clipboard, init_osx_clipboard, init_no_clipboard)
+
+if IS_WINDOWS:
+    from pyperclip.windows import init_windows_clipboard
 
 
 class _TestClipboard(unittest.TestCase):
