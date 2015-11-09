@@ -1,3 +1,4 @@
+v1.5.22, 2015/11/08 -- Fix segfault for PyQt4 copy/paste functions
 v1.5.21, 2015/11/04 -- Import fixes.
 v1.5.20, 2015/10/30 -- Big refactoring and testing additions from mhils. Thanks!
 v1.5.19, 2015/10/29 -- Updating setup.py to pull version info from __init__.py

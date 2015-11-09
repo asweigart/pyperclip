@@ -20,7 +20,7 @@ On Linux, this module makes use of the xclip or xsel commands, which should come
 
 The gtk module is not available for Python 3, and this module does not work with PyGObject yet.
 """
-__version__ = '1.5.21'
+__version__ = '1.5.22'
 
 import platform
 import os
