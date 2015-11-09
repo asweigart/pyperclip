@@ -38,19 +38,18 @@ def init_gtk_clipboard():
 
 
 def init_qt_clipboard():
-    # We must not import PyQt4 at the top,
-    # because `import PyQt4` sys.exit()s if $DISPLAY is not set on unix systems.
-    import PyQt4.QtGui
+    # $DISPLAY should exist
+    from PyQt4.QtGui import QApplication
 
-    # FIXME: This segfaults on one of my systems?
-    app = PyQt4.QtGui.QApplication([])  # TODO: is this required?
-    cb = PyQt4.QtGui.QApplication.clipboard()
+    app = QApplication([])
 
     def copy_qt(text):
+        cb = app.clipboard()
         cb.setText(text)
 
     def paste_qt():
-        return str(cb.text())  # TODO: should str() be replaced with STRING_FUNCTION()?
+        cb = app.clipboard()
+        return str(cb.text())
 
     return copy_qt, paste_qt
 
