@@ -5,7 +5,6 @@ import time
 import contextlib
 import ctypes
 from ctypes import c_size_t, sizeof, c_wchar_p, get_errno, c_wchar
-from ctypes.wintypes import HGLOBAL, LPVOID, DWORD, LPCSTR, INT, HWND, HINSTANCE, HMENU, BOOL, UINT, HANDLE
 from .exceptions import PyperclipWindowsException
 
 
@@ -24,13 +23,17 @@ class CheckedCall(object):
 
 
 def init_windows_clipboard(cygwin=False):
+    from ctypes.wintypes import (HGLOBAL, LPVOID, DWORD, LPCSTR, INT, HWND,
+                                 HINSTANCE, HMENU, BOOL, UINT, HANDLE)
+
     if cygwin:
         windll = ctypes.cdll  # TODO: This is untested
     else:
         windll = ctypes.windll
 
     safeCreateWindowExA = CheckedCall(windll.user32.CreateWindowExA)
-    safeCreateWindowExA.argtypes = [DWORD, LPCSTR, LPCSTR, DWORD, INT, INT, INT, INT, HWND, HMENU, HINSTANCE, LPVOID]
+    safeCreateWindowExA.argtypes = [DWORD, LPCSTR, LPCSTR, DWORD, INT, INT,
+                                    INT, INT, HWND, HMENU, HINSTANCE, LPVOID]
     safeCreateWindowExA.restype = HWND
 
     safeDestroyWindow = CheckedCall(windll.user32.DestroyWindow)
@@ -81,8 +84,10 @@ def init_windows_clipboard(cygwin=False):
         """
         Context that provides a valid Windows hwnd.
         """
-        # we really just need the hwnd, so setting "STATIC" as predefined lpClass is just fine.
-        hwnd = safeCreateWindowExA(0, b"STATIC", None, 0, 0, 0, 0, 0, None, None, None, None)
+        # we really just need the hwnd, so setting "STATIC"
+        # as predefined lpClass is just fine.
+        hwnd = safeCreateWindowExA(0, b"STATIC", None, 0, 0, 0, 0, 0,
+                                   None, None, None, None)
         try:
             yield hwnd
         finally:
@@ -91,9 +96,11 @@ def init_windows_clipboard(cygwin=False):
     @contextlib.contextmanager
     def clipboard(hwnd):
         """
-        Context manager that opens the clipboard and prevents other applications from modifying the clipboard content.
+        Context manager that opens the clipboard and prevents
+        other applications from modifying the clipboard content.
         """
-        # We may not get the clipboard handle immediately because some other application is accessing it (?)
+        # We may not get the clipboard handle immediately because
+        # some other application is accessing it (?)
         # We try for at least 500ms to get the clipboard.
         t = time.time() + 0.5
         success = False
@@ -112,24 +119,27 @@ def init_windows_clipboard(cygwin=False):
 
     def copy_windows(text):
         # This function is heavily based on
-        # https://msdn.microsoft.com/de-de/library/windows/desktop/ms649016(v=vs.85).aspx#_win32_Copying_Information_to_the_Clipboard
-
+        # http://msdn.com/ms649016#_win32_Copying_Information_to_the_Clipboard
         with window() as hwnd:
-            # https://msdn.microsoft.com/de-de/library/windows/desktop/ms649048(v=vs.85).aspx
-            # > If an application calls OpenClipboard with hwnd set to NULL, EmptyClipboard sets the clipboard owner to
-            # > NULL; this causes SetClipboardData to fail.
+            # http://msdn.com/ms649048
+            # If an application calls OpenClipboard with hwnd set to NULL,
+            # EmptyClipboard sets the clipboard owner to NULL;
+            # this causes SetClipboardData to fail.
             # => We need a valid hwnd to copy something.
             with clipboard(hwnd):
                 safeEmptyClipboard()
 
                 if text:
-                    # https://msdn.microsoft.com/de-de/library/windows/desktop/ms649051(v=vs.85).aspx
-                    # > If the hMem parameter identifies a memory object, the object must have been allocated using the
-                    # > function with the GMEM_MOVEABLE flag.
-                    handle = safeGlobalAlloc(GMEM_MOVEABLE, (len(text) + 1) * sizeof(c_wchar))
+                    # http://msdn.com/ms649051
+                    # If the hMem parameter identifies a memory object,
+                    # the object must have been allocated using the
+                    # function with the GMEM_MOVEABLE flag.
+                    count = len(text) + 1
+                    handle = safeGlobalAlloc(GMEM_MOVEABLE,
+                                             count * sizeof(c_wchar))
                     locked_handle = safeGlobalLock(handle)
 
-                    if wcscpy_s(c_wchar_p(locked_handle), len(text) + 1, c_wchar_p(text)):
+                    if wcscpy_s(c_wchar_p(locked_handle), count, c_wchar_p(text)):
                         raise PyperclipWindowsException("Error calling wcscpy_s")
 
                     safeGlobalUnlock(handle)
@@ -139,8 +149,10 @@ def init_windows_clipboard(cygwin=False):
         with clipboard(None):
             handle = safeGetClipboardData(CF_UNICODETEXT)
             if not handle:
-                # GetClipboardData may return NULL with errno == NO_ERROR if the clipboard is empty.
-                # (Also, it may return a handle to an empty buffer, but technically that's not empty)
+                # GetClipboardData may return NULL with errno == NO_ERROR
+                # if the clipboard is empty.
+                # (Also, it may return a handle to an empty buffer,
+                # but technically that's not empty)
                 return ""
             return c_wchar_p(handle).value
 

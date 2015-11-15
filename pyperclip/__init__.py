@@ -25,17 +25,11 @@ __version__ = '1.5.22'
 import platform
 import os
 import subprocess
-
-IS_WINDOWS = platform.system() == 'Windows' or 'cygwin' in platform.system().lower()
-IS_UNIX = os.name == 'posix'
-
-if IS_UNIX:
-    from .clipboards import (init_gtk_clipboard, init_klipper_clipboard, init_osx_clipboard,
-                             init_qt_clipboard, init_xclip_clipboard, init_xsel_clipboard,
-                             init_no_clipboard)
-
-if IS_WINDOWS:
-    from .windows import init_windows_clipboard
+from .clipboards import (init_osx_clipboard,
+                         init_gtk_clipboard, init_qt_clipboard,
+                         init_xclip_clipboard, init_xsel_clipboard,
+                         init_klipper_clipboard, init_no_clipboard)
+from .windows import init_windows_clipboard
 
 PY2 = '2' == platform.python_version_tuple()[0]
 STRING_FUNCTION = unicode if PY2 else str
@@ -43,10 +37,12 @@ STRING_FUNCTION = unicode if PY2 else str
 # `import PyQt4` sys.exit()s if DISPLAY is not in the environment.
 # Thus, we need to detect the presence of $DISPLAY manually not not load PyQt4 if it is absent.
 HAS_DISPLAY = "DISPLAY" in os.environ or not (os.name == 'posix' or platform.system() == 'Linux')
+CHECK_CMD = "where" if platform.system() == "Windows" else "which"
 
 
 def _executable_exists(name):
-    return subprocess.call(['which', name], stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+    return subprocess.call([CHECK_CMD, name],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
 def determine_clipboard():
@@ -87,28 +83,20 @@ def set_clipboard(clipboard):
     global copy, paste
 
     if clipboard == 'osx':
-        from .clipboards import init_osx_clipboard
         copy, paste = init_osx_clipboard()
     elif clipboard == 'gtk':
-        from .clipboards import init_gtk_clipboard
         copy, paste = init_gtk_clipboard()
     elif clipboard == 'qt':
-        from .clipboards import init_qt_clipboard
         copy, paste = init_qt_clipboard()
     elif clipboard == 'xclip':
-        from .clipboards import init_xclip_clipboard
         copy, paste = init_xclip_clipboard()
     elif clipboard == 'xsel':
-        from .clipboards import init_xsel_clipboard
         copy, paste = init_xsel_clipboard()
     elif clipboard == 'klipper':
-        from .clipboards import init_klipper_clipboard
         copy, paste = init_klipper_clipboard()
     elif clipboard == 'no':
-        from .clipboards import init_no_clipboard
         copy, paste = init_no_clipboard()
     elif clipboard == 'windows':
-        from .windows import init_windows_clipboard
         copy, paste = init_windows_clipboard()
 
 
