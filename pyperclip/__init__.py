@@ -82,22 +82,16 @@ def determine_clipboard():
 def set_clipboard(clipboard):
     global copy, paste
 
-    if clipboard == 'osx':
-        copy, paste = init_osx_clipboard()
-    elif clipboard == 'gtk':
-        copy, paste = init_gtk_clipboard()
-    elif clipboard == 'qt':
-        copy, paste = init_qt_clipboard()
-    elif clipboard == 'xclip':
-        copy, paste = init_xclip_clipboard()
-    elif clipboard == 'xsel':
-        copy, paste = init_xsel_clipboard()
-    elif clipboard == 'klipper':
-        copy, paste = init_klipper_clipboard()
-    elif clipboard == 'no':
-        copy, paste = init_no_clipboard()
-    elif clipboard == 'windows':
-        copy, paste = init_windows_clipboard()
+    clipboard_types = {'osx': init_osx_clipboard,
+                       'gtk': init_gtk_clipboard,
+                       'qt': init_qt_clipboard,
+                       'xclip': init_xclip_clipboard,
+                       'xsel': init_xsel_clipboard,
+                       'klipper': init_klipper_clipboard,
+                       'windows': init_windows_clipboard,
+                       'no': init_no_clipboard}
+
+    copy, paste = clipboard_types[clipboard]()
 
 
 copy, paste = determine_clipboard()
