@@ -2,16 +2,22 @@ import sys
 import subprocess
 from .exceptions import PyperclipException
 
+EXCEPT_MSG = """
+    Pyperclip could not find a copy/paste mechanism for your system.
+    For more information, please visit https://pyperclip.readthedocs.org """
 PY2 = sys.version_info[0] == 2
+text_type = unicode if PY2 else str
 
 
 def init_osx_clipboard():
     def copy_osx(text):
-        p = subprocess.Popen(['pbcopy', 'w'], stdin=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(['pbcopy', 'w'],
+                             stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode('utf-8'))
 
     def paste_osx():
-        p = subprocess.Popen(['pbpaste', 'r'], stdout=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(['pbpaste', 'r'],
+                             stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode('utf-8')
 
@@ -28,7 +34,8 @@ def init_gtk_clipboard():
         cb.store()
 
     def paste_gtk():
-        clipboardContents = gtk.Clipboard().wait_for_text()  # for python 2, returns None if the clipboard is blank.
+        clipboardContents = gtk.Clipboard().wait_for_text()
+        # for python 2, returns None if the clipboard is blank.
         if clipboardContents is None:
             return ''
         else:
@@ -49,18 +56,20 @@ def init_qt_clipboard():
 
     def paste_qt():
         cb = app.clipboard()
-        return str(cb.text())
+        return text_type(cb.text())
 
     return copy_qt, paste_qt
 
 
 def init_xclip_clipboard():
     def copy_xclip(text):
-        p = subprocess.Popen(['xclip', '-selection', 'c'], stdin=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(['xclip', '-selection', 'c'],
+                             stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode('utf-8'))
 
     def paste_xclip():
-        p = subprocess.Popen(['xclip', '-selection', 'c', '-o'], stdout=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(['xclip', '-selection', 'c', '-o'],
+                             stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode('utf-8')
 
@@ -69,11 +78,13 @@ def init_xclip_clipboard():
 
 def init_xsel_clipboard():
     def copy_xsel(text):
-        p = subprocess.Popen(['xsel', '-b', '-i'], stdin=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(['xsel', '-b', '-i'],
+                             stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode('utf-8'))
 
     def paste_xsel():
-        p = subprocess.Popen(['xsel', '-b', '-o'], stdout=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(['xsel', '-b', '-o'],
+                             stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode('utf-8')
 
@@ -83,29 +94,30 @@ def init_xsel_clipboard():
 def init_klipper_clipboard():
     def copy_klipper(text):
         p = subprocess.Popen(
-            ['qdbus', 'org.kde.klipper', '/klipper', 'setClipboardContents', text.encode('utf-8')],
-            stdin=subprocess.PIPE,
-            close_fds=True
-        )
+            ['qdbus', 'org.kde.klipper', '/klipper', 'setClipboardContents',
+             text.encode('utf-8')],
+            stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=None)
 
     def paste_klipper():
         p = subprocess.Popen(
             ['qdbus', 'org.kde.klipper', '/klipper', 'getClipboardContents'],
-            stdout=subprocess.PIPE,
-            close_fds=True
-        )
+            stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
 
-        # Apparently Klipper has a bug that adds a newline to the end. It was reported in Klipper version 0.20.3 but I've
-        # seen it in 0.9.7. The bug is unfixed. This function will remove a newline if the string has one.
-        # TODO: In the future, once Klipper is fixed, check the version number to decided whether or not to strip the
-        # newline.
+        # Apparently Klipper has a bug that adds a newline to the end.
+        # It was reported in Klipper version 0.20.3 but I've seen it in 0.9.7.
+        # The bug is unfixed. This function will remove a newline
+        # if the string has one.
+        # TODO: In the future, once Klipper is fixed, check the version
+        # number to decided whether or not to strip the newline.
         # https://bugs.kde.org/show_bug.cgi?id=342874
 
         clipboardContents = stdout.decode('utf-8')
-        assert len(clipboardContents) > 0  # even if blank, Klipper will append a newline at the end
-        assert clipboardContents.endswith('\n')  # make sure that newline is there
+        # even if blank, Klipper will append a newline at the end
+        assert len(clipboardContents) > 0
+        # make sure that newline is there
+        assert clipboardContents.endswith('\n')
         if clipboardContents.endswith('\n'):
             clipboardContents = clipboardContents[:-1]
         return clipboardContents
@@ -116,10 +128,7 @@ def init_klipper_clipboard():
 def init_no_clipboard():
     class ClipboardUnavailable(object):
         def __call__(self, *args, **kwargs):
-            raise PyperclipException(
-                'Pyperclip could not find a copy/paste mechanism for your system. '
-                'Please see https://pyperclip.readthedocs.org for how to fix this.'
-            )
+            raise PyperclipException(EXCEPT_MSG)
 
         if PY2:
             def __nonzero__(self):
