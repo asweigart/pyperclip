@@ -72,10 +72,6 @@ def init_windows_clipboard(cygwin=False):
     safeGlobalUnlock.argtypes = [HGLOBAL]
     safeGlobalUnlock.restype = BOOL
 
-    wcscpy_s = ctypes.cdll.msvcrt.wcscpy_s
-    wcscpy_s.argtypes = [c_wchar_p, c_size_t, c_wchar_p]
-    wcscpy_s.restype = c_wchar_p
-
     GMEM_MOVEABLE = 0x0002
     CF_UNICODETEXT = 13
 
@@ -139,8 +135,7 @@ def init_windows_clipboard(cygwin=False):
                                              count * sizeof(c_wchar))
                     locked_handle = safeGlobalLock(handle)
 
-                    if wcscpy_s(c_wchar_p(locked_handle), count, c_wchar_p(text)):
-                        raise PyperclipWindowsException("Error calling wcscpy_s")
+                    ctypes.memmove(c_wchar_p(locked_handle), c_wchar_p(text), count * sizeof(c_wchar))
 
                     safeGlobalUnlock(handle)
                     safeSetClipboardData(CF_UNICODETEXT, handle)
