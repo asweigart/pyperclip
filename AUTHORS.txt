@@ -16,4 +16,5 @@ Nikolaos-Digenis Karagiannis https://github.com/Digenis
 Nils Ohlmeier https://github.com/nils-ohlmeier
 Stefan Scherfke https://github.com/sscherfke
 Steve Elam
+Tamir Bahar https://github.com/tmr232
 ZEDGR https://github.com/ZEDGR
