@@ -22,14 +22,11 @@ class CheckedCall(object):
         setattr(self.f, key, value)
 
 
-def init_windows_clipboard(cygwin=False):
+def init_windows_clipboard():
     from ctypes.wintypes import (HGLOBAL, LPVOID, DWORD, LPCSTR, INT, HWND,
                                  HINSTANCE, HMENU, BOOL, UINT, HANDLE)
 
-    if cygwin:
-        windll = ctypes.cdll  # TODO: This is untested
-    else:
-        windll = ctypes.windll
+    windll = ctypes.windll
 
     safeCreateWindowExA = CheckedCall(windll.user32.CreateWindowExA)
     safeCreateWindowExA.argtypes = [DWORD, LPCSTR, LPCSTR, DWORD, INT, INT,
