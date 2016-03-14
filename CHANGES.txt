@@ -1,3 +1,4 @@
+v1.5.27, 2016/03/14 -- Disable broken cygwin implementation until issue 55 can be fixed
 v1.5.26, 2016/01/20 -- Fix #51, Replace wcscpy_s with memmove for Windows XP.
 v1.5.25, 2015/12/13 -- Fix #53, PEP8 changes, STRING_FUNCTION rename
 v1.5.24, 2015/11/14 -- Fix for Import ctypes.wintypes on Linux issue.
