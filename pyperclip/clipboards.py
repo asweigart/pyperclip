@@ -62,13 +62,22 @@ def init_qt_clipboard():
 
 
 def init_xclip_clipboard():
-    def copy_xclip(text):
-        p = subprocess.Popen(['xclip', '-selection', 'c'],
+    DEFAULT_SELECTION='c'
+    PRIMARY_SELECTION='p'
+
+    def copy_xclip(text, primary=False):
+        selection=DEFAULT_SELECTION
+        if primary:
+            selection=PRIMARY_SELECTION
+        p = subprocess.Popen(['xclip', '-selection', selection],
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode('utf-8'))
 
-    def paste_xclip():
-        p = subprocess.Popen(['xclip', '-selection', 'c', '-o'],
+    def paste_xclip(primary=False):
+        selection=DEFAULT_SELECTION
+        if primary:
+            selection=PRIMARY_SELECTION
+        p = subprocess.Popen(['xclip', '-selection', selection, '-o'],
                              stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode('utf-8')
@@ -77,13 +86,22 @@ def init_xclip_clipboard():
 
 
 def init_xsel_clipboard():
-    def copy_xsel(text):
-        p = subprocess.Popen(['xsel', '-b', '-i'],
+    DEFAULT_SELECTION='-b'
+    PRIMARY_SELECTION='-p'
+
+    def copy_xsel(text, primary=False):
+        selection_flag = DEFAULT_SELECTION
+        if primary:
+            selection_flag = PRIMARY_SELECTION
+        p = subprocess.Popen(['xsel', selection_flag, '-i'],
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode('utf-8'))
 
-    def paste_xsel():
-        p = subprocess.Popen(['xsel', '-b', '-o'],
+    def paste_xsel(primary=False):
+        selection_flag = DEFAULT_SELECTION
+        if primary:
+            selection_flag = PRIMARY_SELECTION
+        p = subprocess.Popen(['xsel', selection_flag, '-o'],
                              stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode('utf-8')
