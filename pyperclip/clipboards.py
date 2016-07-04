@@ -46,9 +46,12 @@ def init_gtk_clipboard():
 
 def init_qt_clipboard():
     # $DISPLAY should exist
-    from PyQt4.QtGui import QApplication
+    # from PyQt4.QtGui import QApplication
+    from qtpy.QtWidgets import QApplication
 
-    app = QApplication([])
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
 
     def copy_qt(text):
         cb = app.clipboard()
