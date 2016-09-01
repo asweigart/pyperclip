@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from pyperclip import _executable_exists, HAS_DISPLAY
-from pyperclip.clipboards import (init_osx_clipboard,
+from pyperclip.clipboards import (init_osx_cmd_clipboard, init_osx_pyobjc_clipboard,
                                   init_gtk_clipboard, init_qt_clipboard,
                                   init_xclip_clipboard, init_xsel_clipboard,
                                   init_klipper_clipboard, init_no_clipboard)
@@ -75,7 +75,13 @@ class TestWindows(_TestClipboard):
 
 class TestOSX(_TestClipboard):
     if os.name == 'mac' or platform.system() == 'Darwin':
-        clipboard = init_osx_clipboard()
+        try:
+            import Foundation  # check if pyobc is installed
+            import AppKit
+        except ImportError:
+            clipboard = init_osx_cmd_clipboard()
+        else:
+            clipboard = init_osx_pyobjc_clipboard()
 
 
 class TestGtk(_TestClipboard):

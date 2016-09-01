@@ -23,12 +23,12 @@ Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
 gtk and PyQt4 modules are not available for Python 3,
 and this module does not work with PyGObject yet.
 """
-__version__ = '1.5.27'
+__version__ = '1.5.28'
 
 import platform
 import os
 import subprocess
-from .clipboards import (init_osx_clipboard,
+from .clipboards import (init_osx_cmd_clipboard, init_osx_pyobjc_clipboard,
                          init_gtk_clipboard, init_qt_clipboard,
                          init_xclip_clipboard, init_xsel_clipboard,
                          init_klipper_clipboard, init_no_clipboard)
@@ -56,7 +56,13 @@ def determine_clipboard():
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
     if os.name == 'mac' or platform.system() == 'Darwin':
-        return init_osx_clipboard()
+        try:
+            import Foundation  # check if pyobc is installed
+            import AppKit
+        except ImportError:
+            return init_osx_cmd_clipboard()
+        else:
+            return init_osx_pyobjc_clipboard()
     if HAS_DISPLAY:
         # Determine which command/module is installed, if any.
         try:
