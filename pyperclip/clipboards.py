@@ -1,5 +1,7 @@
 import sys
 import subprocess
+import os
+import platform
 from .exceptions import PyperclipException
 
 EXCEPT_MSG = """
@@ -10,6 +12,8 @@ text_type = unicode if PY2 else str
 
 
 def init_osx_clipboard():
+    assert os.name == 'mac' or platform.system() == 'Darwin', (
+        'Tried to initialize osx clipboard on a non-osx system')
     def copy_osx(text):
         p = subprocess.Popen(['pbcopy', 'w'],
                              stdin=subprocess.PIPE, close_fds=True)
