@@ -74,7 +74,7 @@ class TestWindows(_TestClipboard):
 
 
 class TestOSX(_TestClipboard):
-    if os.name == 'mac' or platform.system() == 'Darwin':
+    if os.name == 'posix' or platform.system() == 'Darwin':
         clipboard = init_osx_clipboard()
 
 
