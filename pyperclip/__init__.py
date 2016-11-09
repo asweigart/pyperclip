@@ -78,8 +78,6 @@ def determine_clipboard():
         else:
             return init_qt_clipboard()
 
-
-
     return init_no_clipboard()
 
 
