@@ -60,13 +60,6 @@ def determine_clipboard():
     if HAS_DISPLAY:
         # Determine which command/module is installed, if any.
         try:
-            import gtk  # check if gtk is installed
-        except ImportError:
-            pass
-        else:
-            return init_gtk_clipboard()
-
-        try:
             import PyQt4  # check if PyQt4 is installed
         except ImportError:
             pass
@@ -79,6 +72,13 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
+        try: # Moved to bottom since currently broken on Ubuntu
+            import gtk  # check if gtk is installed
+        except ImportError:
+            pass
+        else:
+            return init_gtk_clipboard()
+
 
     return init_no_clipboard()
 
