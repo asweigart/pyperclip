@@ -10,6 +10,7 @@ setup(
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
     description=('A cross-platform clipboard module for Python. (only handles plain text for now)'),
+    scripts=['bin/pyperclip'],
     license='BSD',
     packages=['pyperclip'],
     test_suite='tests',
