@@ -79,6 +79,8 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
+        if _executable_exists("termux-clipboard-get") and _executable_exists("termux-clipboard-set"):
+            clipboard = init_termux_android_clipboard()
 
     return init_no_clipboard()
 
@@ -93,6 +95,7 @@ def set_clipboard(clipboard):
                        'xsel': init_xsel_clipboard,
                        'klipper': init_klipper_clipboard,
                        'windows': init_windows_clipboard,
+                       'termux-android', init_termux_android_clipboard,
                        'no': init_no_clipboard}
 
     copy, paste = clipboard_types[clipboard]()

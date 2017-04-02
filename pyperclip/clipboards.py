@@ -119,6 +119,22 @@ def init_klipper_clipboard():
     return copy_klipper, paste_klipper
 
 
+def init_termux_android_clipboard():
+    def copy_termux(text):
+        p = subprocess.Popen('termux-clipboard-set',
+                             stdin=subprocess.PIPE, close_fds=True)
+        p.communicate(input=text.encode('utf-8'))
+
+    def paste_termux():
+        p = subprocess.Popen('termux-clipboard-get',
+                             stdout=subprocess.PIPE, close_fds=True)
+        stdout, stderr = p.communicate()
+        # Skip the newline added by the clipboard
+        return stdout.decode('utf-8')[:-1]
+
+    return copy_termux, paste_termux
+
+
 def init_no_clipboard():
     class ClipboardUnavailable(object):
         def __call__(self, *args, **kwargs):
