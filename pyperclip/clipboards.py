@@ -4,7 +4,7 @@ from .exceptions import PyperclipException
 
 EXCEPT_MSG = """
     Pyperclip could not find a copy/paste mechanism for your system.
-    For more information, please visit https://pyperclip.readthedocs.org """
+    For more information, please visit https://pyperclip.readthedocs.io/en/latest/introduction.html#not-implemented-error """
 PY2 = sys.version_info[0] == 2
 text_type = unicode if PY2 else str
 
