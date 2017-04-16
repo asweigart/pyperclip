@@ -1,5 +1,7 @@
+import os
 import sys
 import subprocess
+import distutils.spawn
 from .exceptions import PyperclipException
 
 EXCEPT_MSG = """
@@ -11,12 +13,24 @@ text_type = unicode if PY2 else str
 
 def init_osx_clipboard():
     def copy_osx(text):
-        p = subprocess.Popen(['pbcopy', 'w'],
+        try:
+            os.environ['TMUX']
+            path = distutils.spawn.find_executable('reattach-to-user-namespace')
+            reattach_to_user_namespace = [path] if path else []
+        except KeyError:
+            reattach_to_user_namespace = []
+        p = subprocess.Popen(reattach_to_user_namespace + ['pbcopy', 'w'],
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode('utf-8'))
 
     def paste_osx():
-        p = subprocess.Popen(['pbpaste', 'r'],
+        try:
+            os.environ['TMUX']
+            path = distutils.spawn.find_executable('reattach-to-user-namespace')
+            reattach_to_user_namespace = [path] if path else []
+        except KeyError:
+            reattach_to_user_namespace = []
+        p = subprocess.Popen(reattach_to_user_namespace + ['pbpaste', 'r'],
                              stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode('utf-8')
