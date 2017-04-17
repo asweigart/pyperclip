@@ -3,6 +3,8 @@ This module implements clipboard handling on Windows using ctypes.
 """
 import time
 import contextlib
+import os
+import platform
 import ctypes
 from ctypes import c_size_t, sizeof, c_wchar_p, get_errno, c_wchar
 from .exceptions import PyperclipWindowsException
@@ -23,6 +25,8 @@ class CheckedCall(object):
 
 
 def init_windows_clipboard():
+    assert os.name == 'nt' or platform.system() == 'Windows', (
+        'Tried to initialize windows clipboard on a non-win32 system')
     from ctypes.wintypes import (HGLOBAL, LPVOID, DWORD, LPCSTR, INT, HWND,
                                  HINSTANCE, HMENU, BOOL, UINT, HANDLE)
 
