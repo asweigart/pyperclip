@@ -12,7 +12,9 @@ from pyperclip import _executable_exists, HAS_DISPLAY
 from pyperclip.clipboards import (init_osx_clipboard,
                                   init_gtk_clipboard, init_qt_clipboard,
                                   init_xclip_clipboard, init_xsel_clipboard,
-                                  init_klipper_clipboard, init_no_clipboard)
+                                  init_klipper_clipboard,
+                                  init_termux_android_clipboard,
+                                  init_no_clipboard)
 from pyperclip.windows import init_windows_clipboard
 
 
@@ -111,6 +113,11 @@ class TestXSel(_TestClipboard):
 class TestKlipper(_TestClipboard):
     if _executable_exists("klipper") and _executable_exists("qdbus"):
         clipboard = init_klipper_clipboard()
+
+
+class TestTermuxAndroid(_TestClipboard):
+    if _executable_exists("termux-clipboard-get") and _executable_exists("termux-clipboard-set"):
+        clipboard = init_termux_android_clipboard()
 
 
 class TestNoClipboard(unittest.TestCase):
