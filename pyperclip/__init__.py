@@ -29,10 +29,13 @@ import platform
 import os
 import subprocess
 from .clipboards import (init_osx_clipboard,
+                         init_osc52_clipboard,
                          init_gtk_clipboard, init_qt_clipboard,
                          init_xclip_clipboard, init_xsel_clipboard,
                          init_klipper_clipboard, init_no_clipboard)
 from .windows import init_windows_clipboard
+import sys
+
 
 # `import PyQt4` sys.exit()s if DISPLAY is not in the environment.
 # Thus, we need to detect the presence of $DISPLAY manually
@@ -45,10 +48,10 @@ def _executable_exists(name):
     return subprocess.call([CHECK_CMD, name],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
-
 def determine_clipboard():
     # Determine the OS/platform and set
     # the copy() and paste() functions accordingly.
+    
     if 'cygwin' in platform.system().lower():
         # FIXME: pyperclip currently does not support Cygwin,
         # see https://github.com/asweigart/pyperclip/issues/55
@@ -79,7 +82,12 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
-
+    elif sys.stdin.isatty():
+        #remote terminal
+        return init_osc52_clipboard()
+        
+        
+        
     return init_no_clipboard()
 
 
@@ -90,6 +98,7 @@ def set_clipboard(clipboard):
                        'gtk': init_gtk_clipboard,
                        'qt': init_qt_clipboard,
                        'xclip': init_xclip_clipboard,
+                       'osc52': init_osc52_clipboard,
                        'xsel': init_xsel_clipboard,
                        'klipper': init_klipper_clipboard,
                        'windows': init_windows_clipboard,

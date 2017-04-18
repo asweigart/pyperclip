@@ -132,3 +132,14 @@ def init_no_clipboard():
                 return False
 
     return ClipboardUnavailable(), ClipboardUnavailable()
+
+def init_osc52_clipboard():
+   import base64
+   def copy_osc52(text):
+        t =  base64.standard_b64encode(text)
+        subprocess.call(
+            ['echo', '-e', '\x1b]52;c;{0}\x07'.format(t)])
+
+   def paste_osc52():
+       return False
+   return copy_osc52, paste_osc52
