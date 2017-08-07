@@ -69,7 +69,9 @@ def init_xclip_clipboard():
 
     def paste_xclip():
         p = subprocess.Popen(['xclip', '-selection', 'c', '-o'],
-                             stdout=subprocess.PIPE, close_fds=True)
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode('utf-8')
 
