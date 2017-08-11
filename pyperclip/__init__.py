@@ -31,7 +31,8 @@ import subprocess
 from .clipboards import (init_osx_clipboard,
                          init_gtk_clipboard, init_qt_clipboard,
                          init_xclip_clipboard, init_xsel_clipboard,
-                         init_klipper_clipboard, init_no_clipboard)
+                         init_klipper_clipboard, init_dev_clipboard,
+                         init_no_clipboard)
 from .windows import init_windows_clipboard
 
 # `import PyQt4` sys.exit()s if DISPLAY is not in the environment.
@@ -49,11 +50,7 @@ def _executable_exists(name):
 def determine_clipboard():
     # Determine the OS/platform and set
     # the copy() and paste() functions accordingly.
-    if 'cygwin' in platform.system().lower():
-        # FIXME: pyperclip currently does not support Cygwin,
-        # see https://github.com/asweigart/pyperclip/issues/55
-        pass
-    elif os.name == 'nt' or platform.system() == 'Windows':
+    if os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
     if os.name == 'mac' or platform.system() == 'Darwin':
         return init_osx_clipboard()
@@ -79,6 +76,10 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
+    # XXX this solution is better IMO than any of the HAS_DISPLAY options
+    # should it be first?
+    if os.path.exists('/dev/clipboard'):
+        return init_dev_clipboard()
 
     return init_no_clipboard()
 
