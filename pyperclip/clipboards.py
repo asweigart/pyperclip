@@ -19,7 +19,7 @@ def init_osx_clipboard():
         p = subprocess.Popen(['pbpaste', 'r'],
                              stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
-        return stdout.decode('utf-8')
+        return stdout.decode('utf-8', errors='replace')
 
     return copy_osx, paste_osx
 
