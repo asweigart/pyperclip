@@ -39,7 +39,8 @@ def init_termux_clipboard():
         p = subprocess.Popen('termux-clipboard-get',
                              stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
-        return stdout.decode('utf-8')
+        # get rid of the trailing newline
+        return stdout.decode('utf-8')[:-1]
 
     return copy_termux, paste_termux
 
