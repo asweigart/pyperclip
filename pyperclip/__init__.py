@@ -81,7 +81,7 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
-     elif _executable_exists("termux-clipboard-get"):
+    elif _executable_exists("termux-clipboard-get"):
          return init_termux_clipboard()
 
     return init_no_clipboard()
