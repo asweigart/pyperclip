@@ -82,7 +82,10 @@ def determine_clipboard():
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
     elif _executable_exists("termux-clipboard-get"):
-         return init_termux_clipboard()
+        # FIXME this command will exist even if the Termux:API plugin is not installed
+        # if it's not installed, copy and paste will just hang
+        # we need a reliable way to determine whether the plugin is installed
+        return init_termux_clipboard()
 
     return init_no_clipboard()
 
