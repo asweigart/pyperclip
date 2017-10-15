@@ -17,8 +17,8 @@ On Windows, no additional modules are needed.
 On Mac, the module uses pbcopy and pbpaste, which should come with the os.
 On Linux, install xclip or xsel via package manager. For example, in Debian:
 sudo apt-get install xclip
-On Android, install the Termux app for terminal emulation, which include
-a copy and paste command
+On Android, install the Termux app for terminal emulation. Then install
+the Termux:API plugin, which provide support for the copy and paste commands.
 
 Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
 
