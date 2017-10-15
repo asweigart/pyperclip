@@ -17,6 +17,8 @@ On Windows, no additional modules are needed.
 On Mac, the module uses pbcopy and pbpaste, which should come with the os.
 On Linux, install xclip or xsel via package manager. For example, in Debian:
 sudo apt-get install xclip
+On Android, install the Termux app for terminal emulation, which include
+a copy and paste command
 
 Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
 
@@ -28,7 +30,7 @@ __version__ = '1.5.27'
 import platform
 import os
 import subprocess
-from .clipboards import (init_osx_clipboard,
+from .clipboards import (init_osx_clipboard, init_termux_clipboard,
                          init_gtk_clipboard, init_qt_clipboard,
                          init_xclip_clipboard, init_xsel_clipboard,
                          init_klipper_clipboard, init_no_clipboard)
@@ -79,6 +81,8 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
+     elif _executable_exists("termux-clipboard-get"):
+         return init_termux_clipboard()
 
     return init_no_clipboard()
 
@@ -87,6 +91,7 @@ def set_clipboard(clipboard):
     global copy, paste
 
     clipboard_types = {'osx': init_osx_clipboard,
+                       'termux': init_termux_clipboard,
                        'gtk': init_gtk_clipboard,
                        'qt': init_qt_clipboard,
                        'xclip': init_xclip_clipboard,
