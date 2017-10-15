@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from pyperclip import _executable_exists, HAS_DISPLAY
-from pyperclip.clipboards import (init_osx_clipboard,
+from pyperclip.clipboards import (init_osx_clipboard, init_termux_clipboard
                                   init_gtk_clipboard, init_qt_clipboard,
                                   init_xclip_clipboard, init_xsel_clipboard,
                                   init_klipper_clipboard, init_no_clipboard)
@@ -72,6 +72,9 @@ class TestWindows(_TestClipboard):
     if os.name == 'nt' or platform.system() == 'Windows':
         clipboard = init_windows_clipboard()
 
+class TestTermux(_TestClipboard):
+    if _executable_exists('termux-clipboard-get'):
+        clipboard = init_termux_clipboard()
 
 class TestOSX(_TestClipboard):
     if os.name == 'mac' or platform.system() == 'Darwin':
