@@ -1,7 +1,7 @@
 """
 Pyperclip
 
-A cross-platform clipboard module for Python. (only handles plain text for now)
+A cross-platform clipboard module for Python, with copy & paste functions for plain text.
 By Al Sweigart al@inventwithpython.com
 BSD License
 
@@ -14,16 +14,36 @@ Usage:
     print("Copy functionality unavailable!")
 
 On Windows, no additional modules are needed.
-On Mac, the module uses pbcopy and pbpaste, which should come with the os.
+On Mac, the pyobjc module is used, falling back to the pbcopy and pbpaste cli
+    commands. (These commands should come with OS X.).
 On Linux, install xclip or xsel via package manager. For example, in Debian:
-sudo apt-get install xclip
+    sudo apt-get install xclip
+    sudo apt-get install xsel
 
 Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
 
 gtk and PyQt4 modules are not available for Python 3,
 and this module does not work with PyGObject yet.
+
+Note: There seem sto be a way to get gtk on Python 3, according to:
+    https://askubuntu.com/questions/697397/python3-is-not-supporting-gtk-module
+
+Cygwin is currently not supported.
+
+Security Note: This module runs programs with these names:
+    - which
+    - where
+    - pbcopy
+    - pbpaste
+    - xclip
+    - xsel
+    - klipper
+    - qdbus
+A malicious user could rename or add programs with these names, tricking
+Pyperclip into running them with whatever permissions the Python process has.
+
 """
-__version__ = '1.5.30'
+__version__ = '1.5.31'
 
 import platform
 import os
@@ -38,24 +58,36 @@ from .windows import init_windows_clipboard
 # Thus, we need to detect the presence of $DISPLAY manually
 # and not load PyQt4 if it is absent.
 HAS_DISPLAY = os.getenv("DISPLAY", False)
-CHECK_CMD = "where" if platform.system() == "Windows" else "which"
 
+# The "which" unix command finds where a command is.
+if platform.system() == 'Windows':
+    WHICH_CMD = 'where'
+else:
+    WHICH_CMD = 'which'
 
 def _executable_exists(name):
-    return subprocess.call([CHECK_CMD, name],
+    return subprocess.call([WHICH_CMD, name],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
 
 
 def determine_clipboard():
-    # Determine the OS/platform and set
-    # the copy() and paste() functions accordingly.
+    '''
+    Determine the OS/platform and set the copy() and paste() functions
+    accordingly.
+    '''
+
+    # Setup for the CYGWIN platform:
     if 'cygwin' in platform.system().lower():
         # FIXME: pyperclip currently does not support Cygwin,
         # see https://github.com/asweigart/pyperclip/issues/55
         pass
+
+    # Setup for the WINDOWS platform:
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
-    if os.name == 'posix' or platform.system() == 'Darwin':
+
+
+    if os.name == 'mac' or platform.system() == 'Darwin':
         try:
             import Foundation  # check if pyobc is installed
             import AppKit

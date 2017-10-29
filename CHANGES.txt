@@ -1,3 +1,4 @@
+v1.5.31, 2017/10/29 -- Fixed another mistake where 'posix' was checked for OS X instead of 'mac' due to a mistaken merge.
 v1.5.30, 2017/10/29 -- Fixed the encoding that was set to "uft-8"
 v1.5.29, 2017/10/29 -- Pyperclip works with qtpy module, osx can use objc now, set pyqt as lower priority than xsel/xclip/klipper, add support for PyQt5
 v1.5.28, 2017/10/28 -- Capture stderr of xclip subprocess, fixed issue #88 where emojii cut off the last character, allowed selection between PRIMARY and CLIPBOARD for xsel and xclip
