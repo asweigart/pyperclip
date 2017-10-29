@@ -23,12 +23,12 @@ Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
 gtk and PyQt4 modules are not available for Python 3,
 and this module does not work with PyGObject yet.
 """
-__version__ = '1.5.27'
+__version__ = '1.5.28'
 
 import platform
 import os
 import subprocess
-from .clipboards import (init_osx_clipboard,
+from .clipboards import (init_osx_cmd_clipboard, init_osx_pyobjc_clipboard,
                          init_gtk_clipboard, init_qt_clipboard,
                          init_xclip_clipboard, init_xsel_clipboard,
                          init_klipper_clipboard, init_no_clipboard)
@@ -56,7 +56,13 @@ def determine_clipboard():
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
     if os.name == 'mac' or platform.system() == 'Darwin':
-        return init_osx_clipboard()
+        try:
+            import Foundation  # check if pyobc is installed
+            import AppKit
+        except ImportError:
+            return init_osx_cmd_clipboard()
+        else:
+            return init_osx_pyobjc_clipboard()
     if HAS_DISPLAY:
         # Determine which command/module is installed, if any.
         try:
@@ -66,12 +72,6 @@ def determine_clipboard():
         else:
             return init_gtk_clipboard()
 
-        try:
-            import PyQt4  # check if PyQt4 is installed
-        except ImportError:
-            pass
-        else:
-            return init_qt_clipboard()
 
         if _executable_exists("xclip"):
             return init_xclip_clipboard()
@@ -79,6 +79,23 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
+
+
+        try:
+            # qtpy is a small abstraction layer that lets you write applications using a single api call to either PyQt or PySide.
+            # https://pypi.python.org/pypi/QtPy
+            import qtpy  # check if qtpy is installed
+        except ImportError:
+            # If qtpy isn't installed, fall back on importing PyQt4.
+            try:
+                import PyQt4  # check if PyQt4 is installed
+            except ImportError:
+                pass
+            else:
+                return init_qt_clipboard()
+        else:
+            return init_qt_clipboard()
+
 
     return init_no_clipboard()
 
