@@ -14,7 +14,7 @@ EXCEPT_MSG = """
     For more information, please visit https://pyperclip.readthedocs.io/en/latest/introduction.html#not-implemented-error """
 PY2 = sys.version_info[0] == 2
 text_type = unicode if PY2 else str
-ENCODING = 'uft-8'
+ENCODING = 'utf-8'
 
 def init_osx_cmd_clipboard():
 
