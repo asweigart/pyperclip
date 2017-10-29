@@ -67,6 +67,14 @@ def determine_clipboard():
             return init_gtk_clipboard()
 
 
+        if _executable_exists("xclip"):
+            return init_xclip_clipboard()
+        if _executable_exists("xsel"):
+            return init_xsel_clipboard()
+        if _executable_exists("klipper") and _executable_exists("qdbus"):
+            return init_klipper_clipboard()
+
+
         try:
             # qtpy is a small abstraction layer that lets you write applications using a single api call to either PyQt or PySide.
             # https://pypi.python.org/pypi/QtPy
@@ -82,13 +90,6 @@ def determine_clipboard():
         else:
             return init_qt_clipboard()
 
-
-        if _executable_exists("xclip"):
-            return init_xclip_clipboard()
-        if _executable_exists("xsel"):
-            return init_xsel_clipboard()
-        if _executable_exists("klipper") and _executable_exists("qdbus"):
-            return init_klipper_clipboard()
 
     return init_no_clipboard()
 
