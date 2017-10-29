@@ -74,11 +74,14 @@ def init_gtk_clipboard():
 def init_qt_clipboard():
     # $DISPLAY should exist
 
-    # Try to import from qtpy, but if that fails try PyQt4
+    # Try to import from qtpy, but if that fails try PyQt5 then PyQt4
     try:
         from qtpy.QtWidgets import QApplication
     except:
-        from PyQt4.QtGui import QApplication
+        try:
+            from PyQt5.QtWidgets import QApplication
+        except:
+            from PyQt4.QtGui import QApplication
 
     app = QApplication.instance()
     if app is None:

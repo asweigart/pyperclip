@@ -109,9 +109,14 @@ class TestGtk(_TestClipboard):
 class TestQt(_TestClipboard):
     if HAS_DISPLAY:
         try:
-            import PyQt4
+            import PyQt5
         except ImportError:
-            pass
+            try:
+                import PyQt4
+            except ImportError:
+                pass
+            else:
+                clipboard = init_qt_clipboard()
         else:
             clipboard = init_qt_clipboard()
 
