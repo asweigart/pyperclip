@@ -4,10 +4,12 @@ answer newbie questions, and generally made Pyperclip that much better:
 
 Al Sweigart
 Alexander Cobleigh ‏@cblgh
+Aniket Pandey https://github.com/lordaniket06
 Anton Yakutovich https://github.com/drakulavich
 Cees Timmerman https://github.com/CTimmerman
 Chris Clark
 Edd Barrett https://github.com/vext01
+fthoma https://github.com/fthoma
 hinlader https://github.com/hinlader
 Hugo https://github.com/hugovk
 Jonathan Slenders https://github.com/jonathanslenders
@@ -18,4 +20,6 @@ Nils Ohlmeier https://github.com/nils-ohlmeier
 Stefan Scherfke https://github.com/sscherfke
 Steve Elam
 Tamir Bahar https://github.com/tmr232
+Troy Sankey https://github.com/pwnage101
+utagawa kiki https://github.com/utgwkk
 ZEDGR https://github.com/ZEDGR
