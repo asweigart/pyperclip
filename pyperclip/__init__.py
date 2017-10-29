@@ -66,13 +66,22 @@ def determine_clipboard():
         else:
             return init_gtk_clipboard()
 
+
         try:
-            # import PyQt4  # check if PyQt4 is installed
-            import qtpy
+            # qtpy is a small abstraction layer that lets you write applications using a single api call to either PyQt or PySide.
+            # https://pypi.python.org/pypi/QtPy
+            import qtpy  # check if qtpy is installed
         except ImportError:
-            pass
+            # If qtpy isn't installed, fall back on importing PyQt4.
+            try:
+                import PyQt4  # check if PyQt4 is installed
+            except ImportError:
+                pass
+            else:
+                return init_qt_clipboard()
         else:
             return init_qt_clipboard()
+
 
         if _executable_exists("xclip"):
             return init_xclip_clipboard()
