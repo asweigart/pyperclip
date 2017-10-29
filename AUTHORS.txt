@@ -4,8 +4,10 @@ answer newbie questions, and generally made Pyperclip that much better:
 
 Al Sweigart
 Alexander Cobleigh ‏@cblgh
+Andrea Scarpino https://github.com/ilpianista
 Aniket Pandey https://github.com/lordaniket06
 Anton Yakutovich https://github.com/drakulavich
+Brian Levin https://github.com/bnice5000
 Cees Timmerman https://github.com/CTimmerman
 Chris Clark
 Edd Barrett https://github.com/vext01
@@ -17,9 +19,13 @@ Marcelo Glezer https://github.com/gato
 Maximilian Hils https://github.com/mhils
 Nikolaos-Digenis Karagiannis https://github.com/Digenis
 Nils Ohlmeier https://github.com/nils-ohlmeier
+Orson Peters https://github.com/orlp
+Six https://github.com/brbsix
 Stefan Scherfke https://github.com/sscherfke
 Steve Elam
 Tamir Bahar https://github.com/tmr232
+Todd Leonhardt https://github.com/tleonhardt
 Troy Sankey https://github.com/pwnage101
 utagawa kiki https://github.com/utgwkk
+Vince West https://github.com/dvincentwest
 ZEDGR https://github.com/ZEDGR

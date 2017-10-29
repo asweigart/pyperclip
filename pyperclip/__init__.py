@@ -88,14 +88,14 @@ def determine_clipboard():
         except ImportError:
             # If qtpy isn't installed, fall back on importing PyQt4.
             try:
+                import PyQt5  # check if PyQt5 is installed
+            except ImportError:
                 try:
-                    import PyQt5  # check if PyQt5 is installed
-                except ImportError:
                     import PyQt4  # check if PyQt4 is installed
+                except ImportError:
+                    pass
                 else:
                     return init_qt_clipboard()
-            except ImportError:
-                pass
             else:
                 return init_qt_clipboard()
         else:
