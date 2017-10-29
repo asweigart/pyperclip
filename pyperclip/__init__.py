@@ -67,7 +67,8 @@ def determine_clipboard():
             return init_gtk_clipboard()
 
         try:
-            import PyQt4  # check if PyQt4 is installed
+            # import PyQt4  # check if PyQt4 is installed
+            import qtpy
         except ImportError:
             pass
         else:
