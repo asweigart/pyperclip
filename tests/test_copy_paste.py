@@ -55,10 +55,22 @@ class _TestClipboard(unittest.TestCase):
             raise unittest.SkipTest()
         self.copy(u"ಠ_ಠ")
 
+    def test_copy_unicode_emoji(self):
+        if not self.supports_unicode:
+            raise unittest.SkipTest()
+        self.copy(u"🙆")
+
     def test_copy_paste_unicode(self):
         if not self.supports_unicode:
             raise unittest.SkipTest()
         msg = u"ಠ_ಠ"
+        self.copy(msg)
+        self.assertEqual(self.paste(), msg)
+
+    def test_copy_paste_unicode_emoji(self):
+        if not self.supports_unicode:
+            raise unittest.SkipTest()
+        msg = u"🙆"
         self.copy(msg)
         self.assertEqual(self.paste(), msg)
 
