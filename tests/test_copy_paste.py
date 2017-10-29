@@ -86,7 +86,7 @@ class TestWindows(_TestClipboard):
 
 
 class TestOSX(_TestClipboard):
-    if os.name == 'mac' or platform.system() == 'Darwin':
+    if os.name == 'posix' or platform.system() == 'Darwin':
         try:
             import Foundation  # check if pyobc is installed
             import AppKit

@@ -55,7 +55,7 @@ def determine_clipboard():
         pass
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
-    if os.name == 'mac' or platform.system() == 'Darwin':
+    if os.name == 'posix' or platform.system() == 'Darwin':
         try:
             import Foundation  # check if pyobc is installed
             import AppKit
