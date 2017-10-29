@@ -4,10 +4,14 @@ import unittest
 import random
 import os
 import platform
+import subprocess
 
 import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+project_root = os.path.join(os.path.dirname(__file__), '..')
+sys.path.insert(0, project_root)
+os.environ['PATH'] = os.path.join(project_root, 'bin') + os.pathsep + os.environ['PATH']
 
+import pyperclip
 from pyperclip import _executable_exists, HAS_DISPLAY
 from pyperclip.clipboards import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
                                   init_gtk_clipboard, init_qt_clipboard,
@@ -147,6 +151,33 @@ class TestNoClipboard(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.paste()
 
+class TestCLI(unittest.TestCase):
+    def setUp(self):
+        super(TestCLI, self).setUp()
+        self.unicode = u"ಠ_ಠ %d\n" % (random.randint(0, 999))
+
+    def _run(this, *args):
+        return subprocess.Popen(['pyperclip'] + list(args),
+            stdin = subprocess.PIPE,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.STDOUT
+        )
+
+    def test_copy(self):
+        proc = self._run('--copy')
+        output, _ = proc.communicate((self.unicode).encode('utf-8'))
+
+        self.assertEqual(output, '')
+        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(pyperclip.paste(), self.unicode.strip())
+
+    def test_paste(self):
+        pyperclip.copy(self.unicode.strip())
+        proc = self._run('--paste')
+        output, _ = proc.communicate()
+
+        self.assertEqual(output.decode('utf-8'), self.unicode)
+        self.assertEqual(proc.poll(), 0)
 
 if __name__ == '__main__':
     unittest.main()
