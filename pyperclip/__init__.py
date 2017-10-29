@@ -23,7 +23,7 @@ Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
 gtk and PyQt4 modules are not available for Python 3,
 and this module does not work with PyGObject yet.
 """
-__version__ = '1.5.28'
+__version__ = '1.5.29'
 
 import platform
 import os
