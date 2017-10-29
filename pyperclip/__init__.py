@@ -10,7 +10,7 @@ Usage:
   pyperclip.copy('The text to be copied to the clipboard.')
   spam = pyperclip.paste()
 
-  if not pyperclip.copy:
+  if not pyperclip.is_available():
     print("Copy functionality unavailable!")
 
 On Windows, no additional modules are needed.
@@ -48,7 +48,9 @@ __version__ = '1.5.31'
 import platform
 import os
 import subprocess
-from .clipboards import (init_osx_cmd_clipboard, init_osx_pyobjc_clipboard,
+import warnings
+
+from .clipboards import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
                          init_gtk_clipboard, init_qt_clipboard,
                          init_xclip_clipboard, init_xsel_clipboard,
                          init_klipper_clipboard, init_no_clipboard)
@@ -80,30 +82,30 @@ def determine_clipboard():
     if 'cygwin' in platform.system().lower():
         # FIXME: pyperclip currently does not support Cygwin,
         # see https://github.com/asweigart/pyperclip/issues/55
-        pass
+        warnings.warn('Pyperclip currently does not support Cygwin, see https://github.com/asweigart/pyperclip/issues/55')
 
     # Setup for the WINDOWS platform:
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
 
-
+    # Setup for the MAC OS X platform:
     if os.name == 'mac' or platform.system() == 'Darwin':
         try:
-            import Foundation  # check if pyobc is installed
+            import Foundation  # check if pyobjc is installed
             import AppKit
         except ImportError:
-            return init_osx_cmd_clipboard()
+            return init_osx_pbcopy_clipboard()
         else:
             return init_osx_pyobjc_clipboard()
+
+    # Setup for the LINUX platform:
     if HAS_DISPLAY:
-        # Determine which command/module is installed, if any.
         try:
             import gtk  # check if gtk is installed
         except ImportError:
-            pass
+            pass # We want to fail fast for all non-ImportError exceptions.
         else:
             return init_gtk_clipboard()
-
 
         if _executable_exists("xclip"):
             return init_xclip_clipboard()
@@ -111,7 +113,6 @@ def determine_clipboard():
             return init_xsel_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
-
 
         try:
             # qtpy is a small abstraction layer that lets you write applications using a single api call to either PyQt or PySide.
@@ -125,7 +126,7 @@ def determine_clipboard():
                 try:
                     import PyQt4  # check if PyQt4 is installed
                 except ImportError:
-                    pass
+                    pass # We want to fail fast for all non-ImportError exceptions.
                 else:
                     return init_qt_clipboard()
             else:
@@ -138,20 +139,91 @@ def determine_clipboard():
 
 
 def set_clipboard(clipboard):
+    '''
+    Explicitly sets the clipboard mechanism. The "clipboard mechanism" is how
+    the copy() and paste() functions interact with the operating system to
+    implement the copy/paste feature. The clipboard parameter must be one of:
+        - pbcopy
+        - pbobjc (default on Mac OS X)
+        - gtk
+        - qt
+        - xclip
+        - xsel
+        - klipper
+        - windows (default on Windows)
+        - no (this is what is set when no clipboard mechanism can be found)
+    '''
     global copy, paste
 
-    clipboard_types = {'osx': init_osx_clipboard,
+    clipboard_types = {'pbcopy': init_osx_pbcopy_clipboard,
+                       'pyobjc': init_osx_pyobjc_clipboard,
                        'gtk': init_gtk_clipboard,
-                       'qt': init_qt_clipboard,
+                       'qt': init_qt_clipboard, # TODO - split this into 'qtpy', 'pyqt4', and 'pyqt5'
                        'xclip': init_xclip_clipboard,
                        'xsel': init_xsel_clipboard,
                        'klipper': init_klipper_clipboard,
                        'windows': init_windows_clipboard,
                        'no': init_no_clipboard}
 
+    if clipboard not in clipboard_types:
+        raise ValueError('Argument must be one of %s' % (', '.join([repr(_) for _ in clipboard_types.keys()])))
+
+    # Sets pyperclip's copy() and paste() functions:
     copy, paste = clipboard_types[clipboard]()
 
 
-copy, paste = determine_clipboard()
+def lazy_load_stub_copy(text):
+    '''
+    A stub function for copy(), which will load the real copy() function when
+    called so that the real copy() function is used for later calls.
 
-__all__ = ["copy", "paste"]
+    This allows users to import pyperclip without having determine_clipboard()
+    automatically run, which will automatically select a clipboard mechanism.
+    This could be a problem if it selects, say, the memory-heavy PyQt4 module
+    but the user was just going to immediately call set_clipboard() to use a
+    different clipboard mechanism.
+
+    The lazy loading this stub function implements gives the user a chance to
+    call set_clipboard() to pick another clipboard mechanism. Or, if the user
+    simply calls copy() or paste() without calling set_clipboard() first,
+    will fall back on whatever clipboard mechanism that determine_clipboard()
+    automatically chooses.
+    '''
+    global copy, paste
+    copy, paste = determine_clipboard()
+    return copy(text)
+
+
+def lazy_load_stub_paste():
+    '''
+    A stub function for paste(), which will load the real paste() function when
+    called so that the real paste() function is used for later calls.
+
+    This allows users to import pyperclip without having determine_clipboard()
+    automatically run, which will automatically select a clipboard mechanism.
+    This could be a problem if it selects, say, the memory-heavy PyQt4 module
+    but the user was just going to immediately call set_clipboard() to use a
+    different clipboard mechanism.
+
+    The lazy loading this stub function implements gives the user a chance to
+    call set_clipboard() to pick another clipboard mechanism. Or, if the user
+    simply calls copy() or paste() without calling set_clipboard() first,
+    will fall back on whatever clipboard mechanism that determine_clipboard()
+    automatically chooses.
+    '''
+    global copy, paste
+    copy, paste = determine_clipboard()
+    return paste()
+
+
+def is_available():
+    return copy != lazy_load_stub_copy and paste != lazy_load_stub_paste
+
+
+# Initially, copy() and paste() are set to lazy loading wrappers which will
+# set `copy` and `paste` to real functions the first time they're used, unless
+# set_clipboard() or determine_clipboard() is called first.
+copy, paste = lazy_load_stub_copy, lazy_load_stub_paste
+
+
+__all__ = ['copy', 'paste', 'set_clipboard', 'determine_clipboard']

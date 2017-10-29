@@ -13,23 +13,23 @@ EXCEPT_MSG = """
     Pyperclip could not find a copy/paste mechanism for your system.
     For more information, please visit https://pyperclip.readthedocs.io/en/latest/introduction.html#not-implemented-error """
 PY2 = sys.version_info[0] == 2
-text_type = unicode if PY2 else str
+STR_OR_UNICODE = unicode if PY2 else str
 ENCODING = 'utf-8'
 
-def init_osx_cmd_clipboard():
+def init_osx_pbcopy_clipboard():
 
-    def copy_osx_cmd(text):
+    def copy_osx_pbcopy(text):
         p = subprocess.Popen(['pbcopy', 'w'],
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode(ENCODING))
 
-    def paste_osx_cmd():
+    def paste_osx_pbcopy():
         p = subprocess.Popen(['pbpaste', 'r'],
                              stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
         return stdout.decode(ENCODING)
 
-    return copy_osx_cmd, paste_osx_cmd
+    return copy_osx_pbcopy, paste_osx_pbcopy
 
 
 def init_osx_pyobjc_clipboard():
@@ -93,7 +93,7 @@ def init_qt_clipboard():
 
     def paste_qt():
         cb = app.clipboard()
-        return text_type(cb.text())
+        return STR_OR_UNICODE(cb.text())
 
     return copy_qt, paste_qt
 

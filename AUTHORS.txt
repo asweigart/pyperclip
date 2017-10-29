@@ -15,6 +15,7 @@ fthoma https://github.com/fthoma
 hinlader https://github.com/hinlader
 Hugo https://github.com/hugovk
 Hynek Cernoch https://github.com/hynekcer
+Jon Crall https://github.com/Erotemic
 Jonathan Slenders https://github.com/jonathanslenders
 Marcelo Glezer https://github.com/gato
 Maximilian Hils https://github.com/mhils
