@@ -1,5 +1,7 @@
 import sys
 import subprocess
+import warnings
+
 from .exceptions import PyperclipException
 
 try:
@@ -179,6 +181,11 @@ def init_klipper_clipboard():
 
 def init_dev_clipboard_clipboard():
     def copy_dev_clipboard(text):
+        if text == '':
+            warnings.warn('Pyperclip cannot copy a blank string to the clipboard on Cygwin. This is effectively a no-op.')
+        if '\r' in text:
+            warnings.warn('Pyperclip cannot handle \\r characters on Cygwin.')
+
         fo = open('/dev/clipboard', 'wt')
         fo.write(text)
         fo.close()

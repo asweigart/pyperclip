@@ -43,7 +43,7 @@ A malicious user could rename or add programs with these names, tricking
 Pyperclip into running them with whatever permissions the Python process has.
 
 """
-__version__ = '1.5.31'
+__version__ = '1.5.32'
 
 import os
 import platform

@@ -26,6 +26,7 @@ Six https://github.com/brbsix
 Stefan Scherfke https://github.com/sscherfke
 Steve Elam
 Tamir Bahar https://github.com/tmr232
+Terrel Shumway https://github.com/lernisto
 Tim Cuthbertson https://github.com/timbertson
 Todd Leonhardt https://github.com/tleonhardt
 Troy Sankey https://github.com/pwnage101
