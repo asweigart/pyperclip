@@ -177,6 +177,21 @@ def init_klipper_clipboard():
     return copy_klipper, paste_klipper
 
 
+def init_dev_clipboard_clipboard():
+    def copy_dev_clipboard(text):
+        fo = open('/dev/clipboard', 'wt')
+        fo.write(text)
+        fo.close()
+
+    def paste_dev_clipboard():
+        fo = open('/dev/clipboard', 'rt')
+        content = fo.read()
+        fo.close()
+        return content
+
+    return copy_dev_clipboard, paste_dev_clipboard
+
+
 def init_no_clipboard():
     class ClipboardUnavailable(object):
 

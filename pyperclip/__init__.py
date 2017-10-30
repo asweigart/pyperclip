@@ -45,12 +45,13 @@ Pyperclip into running them with whatever permissions the Python process has.
 """
 __version__ = '1.5.31'
 
-import platform
 import os
+import platform
 import subprocess
 import warnings
 
 from .clipboards import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
+                         init_dev_clipboard_clipboard,
                          init_gtk_clipboard, init_qt_clipboard,
                          init_xclip_clipboard, init_xsel_clipboard,
                          init_klipper_clipboard, init_no_clipboard)
@@ -79,10 +80,12 @@ def determine_clipboard():
     '''
 
     # Setup for the CYGWIN platform:
-    if 'cygwin' in platform.system().lower():
+    if 'cygwin' in platform.system().lower(): # Cygwin has a variety of values returned by platform.system(), such as 'CYGWIN_NT-6.1'
         # FIXME: pyperclip currently does not support Cygwin,
         # see https://github.com/asweigart/pyperclip/issues/55
-        warnings.warn('Pyperclip currently does not support Cygwin, see https://github.com/asweigart/pyperclip/issues/55')
+        if os.path.exists('/dev/clipboard'):
+            warnings.warn('Pyperclip\'s support for Cygwin is not perfect, see https://github.com/asweigart/pyperclip/issues/55')
+            return init_dev_clipboard_clipboard()
 
     # Setup for the WINDOWS platform:
     elif os.name == 'nt' or platform.system() == 'Windows':
@@ -227,3 +230,5 @@ copy, paste = lazy_load_stub_copy, lazy_load_stub_paste
 
 
 __all__ = ['copy', 'paste', 'set_clipboard', 'determine_clipboard']
+
+
