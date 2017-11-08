@@ -9,12 +9,12 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from pyperclip import _executable_exists, HAS_DISPLAY
-from pyperclip.clipboards import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
+from pyperclip import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
                                   init_dev_clipboard_clipboard,
                                   init_gtk_clipboard, init_qt_clipboard,
                                   init_xclip_clipboard, init_xsel_clipboard,
                                   init_klipper_clipboard, init_no_clipboard)
-from pyperclip.windows import init_windows_clipboard
+from pyperclip import init_windows_clipboard
 
 random.seed(42)
 
