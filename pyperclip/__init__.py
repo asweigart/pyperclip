@@ -20,13 +20,10 @@ On Linux, install xclip or xsel via package manager. For example, in Debian:
     sudo apt-get install xclip
     sudo apt-get install xsel
 
-Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
+Otherwise on Linux, you will need the gi or PyQt5/PyQt4 modules installed.
 
-gtk and PyQt4 modules are not available for Python 3,
+PyQt4 modules are not available for Python 3,
 and this module does not work with PyGObject yet.
-
-Note: There seem sto be a way to get gtk on Python 3, according to:
-    https://askubuntu.com/questions/697397/python3-is-not-supporting-gtk-module
 
 Cygwin is currently not supported.
 
@@ -130,17 +127,17 @@ def init_osx_pyobjc_clipboard():
 
 
 def init_gtk_clipboard():
-    global gtk
-    import gtk
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk, Gdk
+    cb = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
     def copy_gtk(text):
-        global cb
-        cb = gtk.Clipboard()
-        cb.set_text(text)
+        cb.set_text(text, -1)
         cb.store()
 
     def paste_gtk():
-        clipboardContents = gtk.Clipboard().wait_for_text()
+        clipboardContents = cb.wait_for_text()
         # for python 2, returns None if the clipboard is blank.
         if clipboardContents is None:
             return ''
@@ -481,7 +478,7 @@ def determine_clipboard():
     # Setup for the LINUX platform:
     if HAS_DISPLAY:
         try:
-            import gtk  # check if gtk is installed
+            import gi  # check if gi is installed
         except ImportError:
             pass # We want to fail fast for all non-ImportError exceptions.
         else:
