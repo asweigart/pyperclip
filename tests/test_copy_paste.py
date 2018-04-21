@@ -15,6 +15,7 @@ from pyperclip import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
                                   init_xclip_clipboard, init_xsel_clipboard,
                                   init_klipper_clipboard, init_no_clipboard)
 from pyperclip import init_windows_clipboard
+from pyperclip import init_wsl_clipboard
 
 random.seed(42)
 
@@ -85,6 +86,12 @@ class TestCygwin(_TestClipboard):
 class TestWindows(_TestClipboard):
     if os.name == 'nt' or platform.system() == 'Windows':
         clipboard = init_windows_clipboard()
+
+class TestWSL(_TestClipboard):
+    if platform.system() == 'Linux':
+        with open('/proc/version', 'r') as f:
+            if "Microsoft" in f.read():
+                clipboard = init_wsl_clipboard()
 
 
 class TestOSX(_TestClipboard):
