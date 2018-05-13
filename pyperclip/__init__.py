@@ -78,6 +78,8 @@ if platform.system() == 'Windows':
 else:
     WHICH_CMD = 'which'
 
+target = ''
+
 def _executable_exists(name):
     return subprocess.call([WHICH_CMD, name],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
@@ -194,7 +196,11 @@ def init_xclip_clipboard():
         selection=DEFAULT_SELECTION
         if primary:
             selection=PRIMARY_SELECTION
-        p = subprocess.Popen(['xclip', '-selection', selection, '-o'],
+        if target == '':
+            cmd = ['xclip', '-selection', selection, '-o']
+        else:
+            cmd = ['xclip', '-selection', selection, '-t', target, '-o']
+        p = subprocess.Popen(cmd,
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              close_fds=True)
@@ -599,6 +605,9 @@ def lazy_load_stub_paste():
 def is_available():
     return copy != lazy_load_stub_copy and paste != lazy_load_stub_paste
 
+def set_target(text):
+   global target
+   target = text
 
 # Initially, copy() and paste() are set to lazy loading wrappers which will
 # set `copy` and `paste` to real functions the first time they're used, unless
@@ -606,6 +615,6 @@ def is_available():
 copy, paste = lazy_load_stub_copy, lazy_load_stub_paste
 
 
-__all__ = ['copy', 'paste', 'set_clipboard', 'determine_clipboard']
+__all__ = ['copy', 'paste', 'set_clipboard', 'determine_clipboard', 'set_target']
 
 
