@@ -445,6 +445,22 @@ def init_windows_clipboard():
     return copy_windows, paste_windows
 
 
+def init_wsl_clipboard():
+    def copy_wsl(text):
+        p = subprocess.Popen(['clip.exe'],
+                             stdin=subprocess.PIPE, close_fds=True)
+        p.communicate(input=text.encode(ENCODING))
+
+    def paste_wsl():
+        p = subprocess.Popen(['powershell.exe', '-command', 'Get-Clipboard'],
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             close_fds=True)
+        stdout, stderr = p.communicate()
+        # WSL appends "\r\n" to the contents.
+        return stdout[:-2].decode(ENCODING)
+
+    return copy_wsl, paste_wsl
 
 
 # Automatic detection of clipboard mechanisms and importing is done in deteremine_clipboard():
@@ -467,6 +483,11 @@ def determine_clipboard():
     # Setup for the WINDOWS platform:
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
+
+    if platform.system() == 'Linux':
+        with open('/proc/version', 'r') as f:
+            if "Microsoft" in f.read():
+                return init_wsl_clipboard()
 
     # Setup for the MAC OS X platform:
     if os.name == 'mac' or platform.system() == 'Darwin':
