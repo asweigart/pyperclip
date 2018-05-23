@@ -1,3 +1,4 @@
+v1.6.1, 2018/05/23 -- Added Windows subsystem for Linux support.
 v1.5.32, 2017/10/29 -- Added limited cygwin support.
 v1.5.31, 2017/10/29 -- Fixed another mistake where 'posix' was checked for OS X instead of 'mac' due to a mistaken merge. Added lazy loading.
 v1.5.30, 2017/10/29 -- Fixed the encoding that was set to "uft-8"
