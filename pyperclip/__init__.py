@@ -20,12 +20,12 @@ On Linux, install xclip or xsel via package manager. For example, in Debian:
     sudo apt-get install xclip
     sudo apt-get install xsel
 
-Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
+Otherwise on Linux, you will need the gi (GTK+ 3) or PyQt5/PyQt4 modules installed.
+gtk (GTK +2) is still supported as an older alternative to gi.
 
-gtk and PyQt4 modules are not available for Python 3,
-and this module does not work with PyGObject yet.
+gtk and PyQt4 modules are not available for Python 3.
 
-Note: There seem sto be a way to get gtk on Python 3, according to:
+Note: There seems to be a way to get gtk on Python 3, according to:
     https://askubuntu.com/questions/697397/python3-is-not-supporting-gtk-module
 
 Cygwin is currently not supported.
@@ -130,11 +130,9 @@ def init_osx_pyobjc_clipboard():
 
 
 def init_gtk_clipboard():
-    global gtk
     import gtk
 
     def copy_gtk(text):
-        global cb
         cb = gtk.Clipboard()
         cb.set_text(text)
         cb.store()
@@ -148,6 +146,27 @@ def init_gtk_clipboard():
             return clipboardContents
 
     return copy_gtk, paste_gtk
+
+
+def init_gi_clipboard():
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk, Gdk
+    cb = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+
+    def copy_gi(text):
+        cb.set_text(text, -1)
+        cb.store()
+
+    def paste_gi():
+        clipboardContents = cb.wait_for_text()
+        # for python 2, returns None if the clipboard is blank.
+        if clipboardContents is None:
+            return ''
+        else:
+            return clipboardContents
+
+    return copy_gi, paste_gi
 
 
 def init_qt_clipboard():
@@ -502,11 +521,18 @@ def determine_clipboard():
     # Setup for the LINUX platform:
     if HAS_DISPLAY:
         try:
-            import gtk  # check if gtk is installed
+            import gi  # check if gi is installed (for GTK+ 3)
         except ImportError:
-            pass # We want to fail fast for all non-ImportError exceptions.
+            try:
+                import gtk  # check if gtk is installed (fallback to GTK+ 2)
+            except ImportError:
+                pass # We want to fail fast for all non-ImportError exceptions.
+            else:
+                return init_gtk_clipboard()
         else:
-            return init_gtk_clipboard()
+            if gi.version_info[0] >= 3:
+                return init_gi_clipboard()
+            pass
 
         if _executable_exists("xclip"):
             return init_xclip_clipboard()
