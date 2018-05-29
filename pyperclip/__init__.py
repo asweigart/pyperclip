@@ -43,7 +43,7 @@ A malicious user could rename or add programs with these names, tricking
 Pyperclip into running them with whatever permissions the Python process has.
 
 """
-__version__ = '1.6.1'
+__version__ = '1.6.2'
 
 import contextlib
 import ctypes
@@ -98,6 +98,7 @@ class PyperclipWindowsException(PyperclipException):
 def init_osx_pbcopy_clipboard():
 
     def copy_osx_pbcopy(text):
+        text = str(text) # Converts non-str values to str.
         p = subprocess.Popen(['pbcopy', 'w'],
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode(ENCODING))
@@ -114,6 +115,7 @@ def init_osx_pbcopy_clipboard():
 def init_osx_pyobjc_clipboard():
     def copy_osx_pyobjc(text):
         '''Copy string argument to clipboard'''
+        text = str(text) # Converts non-str values to str.
         newStr = Foundation.NSString.stringWithString_(text).nsstring()
         newData = newStr.dataUsingEncoding_(Foundation.NSUTF8StringEncoding)
         board = AppKit.NSPasteboard.generalPasteboard()
@@ -135,6 +137,7 @@ def init_gtk_clipboard():
 
     def copy_gtk(text):
         global cb
+        text = str(text) # Converts non-str values to str.
         cb = gtk.Clipboard()
         cb.set_text(text)
         cb.store()
@@ -168,6 +171,7 @@ def init_qt_clipboard():
         app = QApplication([])
 
     def copy_qt(text):
+        text = str(text) # Converts non-str values to str.
         cb = app.clipboard()
         cb.setText(text)
 
@@ -183,6 +187,7 @@ def init_xclip_clipboard():
     PRIMARY_SELECTION='p'
 
     def copy_xclip(text, primary=False):
+        text = str(text) # Converts non-str values to str.
         selection=DEFAULT_SELECTION
         if primary:
             selection=PRIMARY_SELECTION
@@ -210,6 +215,7 @@ def init_xsel_clipboard():
     PRIMARY_SELECTION='-p'
 
     def copy_xsel(text, primary=False):
+        text = str(text) # Converts non-str values to str.
         selection_flag = DEFAULT_SELECTION
         if primary:
             selection_flag = PRIMARY_SELECTION
@@ -231,6 +237,7 @@ def init_xsel_clipboard():
 
 def init_klipper_clipboard():
     def copy_klipper(text):
+        text = str(text) # Converts non-str values to str.
         p = subprocess.Popen(
             ['qdbus', 'org.kde.klipper', '/klipper', 'setClipboardContents',
              text.encode(ENCODING)],
@@ -259,6 +266,7 @@ def init_klipper_clipboard():
 
 def init_dev_clipboard_clipboard():
     def copy_dev_clipboard(text):
+        text = str(text) # Converts non-str values to str.
         if text == '':
             warnings.warn('Pyperclip cannot copy a blank string to the clipboard on Cygwin. This is effectively a no-op.')
         if '\r' in text:
@@ -407,6 +415,9 @@ def init_windows_clipboard():
     def copy_windows(text):
         # This function is heavily based on
         # http://msdn.com/ms649016#_win32_Copying_Information_to_the_Clipboard
+
+        text = str(text) # Converts non-str values to str.
+
         with window() as hwnd:
             # http://msdn.com/ms649048
             # If an application calls OpenClipboard with hwnd set to NULL,
@@ -447,6 +458,7 @@ def init_windows_clipboard():
 
 def init_wsl_clipboard():
     def copy_wsl(text):
+        text = str(text) # Converts non-str values to str.
         p = subprocess.Popen(['clip.exe'],
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode(ENCODING))

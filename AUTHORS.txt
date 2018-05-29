@@ -27,6 +27,7 @@ Nikolaos-Digenis Karagiannis https://github.com/Digenis
 Nils Ohlmeier https://github.com/nils-ohlmeier
 Orson Peters https://github.com/orlp
 Six https://github.com/brbsix
+Stefan Devai https://github.com/stefandevai
 Stefan Scherfke https://github.com/sscherfke
 Steve Elam
 Tamir Bahar https://github.com/tmr232
