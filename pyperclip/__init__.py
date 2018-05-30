@@ -25,7 +25,7 @@ Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
 gtk and PyQt4 modules are not available for Python 3,
 and this module does not work with PyGObject yet.
 
-Note: There seem sto be a way to get gtk on Python 3, according to:
+Note: There seems to be a way to get gtk on Python 3, according to:
     https://askubuntu.com/questions/697397/python3-is-not-supporting-gtk-module
 
 Cygwin is currently not supported.
@@ -525,10 +525,10 @@ def determine_clipboard():
         else:
             return init_gtk_clipboard()
 
-        if _executable_exists("xclip"):
-            return init_xclip_clipboard()
         if _executable_exists("xsel"):
             return init_xsel_clipboard()
+        if _executable_exists("xclip"):
+            return init_xclip_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
 
