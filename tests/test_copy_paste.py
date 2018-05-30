@@ -17,7 +17,9 @@ from pyperclip import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
 from pyperclip import init_windows_clipboard
 from pyperclip import init_wsl_clipboard
 
-random.seed(42)
+from pyperclip import PyperclipException
+
+random.seed(42) # Make the "random" tests reproducible.
 
 class _TestClipboard(unittest.TestCase):
     clipboard = None
@@ -76,6 +78,32 @@ class _TestClipboard(unittest.TestCase):
         msg = u"🙆"
         self.copy(msg)
         self.assertEqual(self.paste(), msg)
+
+    def test_non_str(self):
+        # Test copying an int.
+        self.copy(42)
+        self.assertEqual(self.paste(), '42')
+
+        self.copy(-1)
+        self.assertEqual(self.paste(), '-1')
+
+        # Test copying a float.
+        self.copy(3.141592)
+        self.assertEqual(self.paste(), '3.141592')
+
+        # Test copying bools.
+        self.copy(True)
+        self.assertEqual(self.paste(), 'True')
+
+        self.copy(False)
+        self.assertEqual(self.paste(), 'False')
+
+        # All other non-str values raise an exception.
+        with self.assertRaises(PyperclipException):
+            self.copy(None)
+
+        with self.assertRaises(PyperclipException):
+            self.copy([2, 4, 6, 8])
 
 
 class TestCygwin(_TestClipboard):
