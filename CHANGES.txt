@@ -1,3 +1,7 @@
+v1.6.4, 2018/07/18 -- Adjusted setup.py to include the long description.
+v1.6.3, 2018/07/18 -- Adjusted setup.py to include the long description.
+v1.6.2, 2018/07/18 -- Adjusted setup.py to include the long description.
+v1.6.1, 2018/07/18 -- Adjusted setup.py to include the long description.
 v1.6.1, 2018/05/23 -- Added Windows subsystem for Linux support.
 v1.5.32, 2017/10/29 -- Added limited cygwin support.
 v1.5.31, 2017/10/29 -- Fixed another mistake where 'posix' was checked for OS X instead of 'mac' due to a mistaken merge. Added lazy loading.

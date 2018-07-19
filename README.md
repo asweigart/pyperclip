@@ -8,12 +8,11 @@ BSD License
 Example Usage
 =============
 
-```python
->>> import pyperclip
->>> pyperclip.copy('The text to be copied to the clipboard.')
->>> pyperclip.paste()
-'The text to be copied to the clipboard.'
-```
+    >>> import pyperclip
+    >>> pyperclip.copy('The text to be copied to the clipboard.')
+    >>> pyperclip.paste()
+    'The text to be copied to the clipboard.'
+
 
 Currently only handles plaintext.
 
