@@ -5,8 +5,8 @@ import random
 import os
 import platform
 
-import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+#import sys
+#sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from pyperclip import _executable_exists, HAS_DISPLAY
 from pyperclip import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,

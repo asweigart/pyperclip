@@ -1,8 +1,8 @@
 import re
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # Load version from module (without loading the whole module)
-with open('pyperclip/__init__.py', 'r') as fd:
+with open('src/pyperclip/__init__.py', 'r') as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
                         fd.read(), re.MULTILINE).group(1)
 
@@ -20,7 +20,8 @@ setup(
     description=('A cross-platform clipboard module for Python. (Only handles plain text for now.)'),
     long_description=long_description,
     license='BSD',
-    packages=['pyperclip'],
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
     test_suite='tests',
     keywords="clipboard copy paste clip xsel xclip",
     classifiers=[
