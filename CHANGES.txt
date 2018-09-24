@@ -1,3 +1,4 @@
+v1.6.5, 2018/09/24 -- Fix for issue #129, where unicode text caused exceptions on Python 2.
 v1.6.4, 2018/07/18 -- Adjusted setup.py to include the long description.
 v1.6.3, 2018/07/18 -- Adjusted setup.py to include the long description.
 v1.6.2, 2018/07/18 -- Adjusted setup.py to include the long description.

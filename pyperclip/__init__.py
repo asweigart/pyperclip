@@ -43,7 +43,7 @@ A malicious user could rename or add programs with these names, tricking
 Pyperclip into running them with whatever permissions the Python process has.
 
 """
-__version__ = '1.6.4'
+__version__ = '1.6.5'
 
 import contextlib
 import ctypes
@@ -68,7 +68,7 @@ EXCEPT_MSG = """
 
 PY2 = sys.version_info[0] == 2
 
-STR_OR_UNICODE = unicode if PY2 else str
+STR_OR_UNICODE = unicode if PY2 else str # For paste(): Python 3 uses str, Python 2 uses unicode.
 
 ENCODING = 'utf-8'
 
@@ -95,9 +95,13 @@ class PyperclipWindowsException(PyperclipException):
 
 
 def _stringifyText(text):
-    if not isinstance(text, (str, int, float, bool)):
+    if PY2:
+        acceptedTypes = (unicode, str, int, float, bool)
+    else:
+        acceptedTypes = (str, int, float, bool)
+    if not isinstance(text, acceptedTypes):
         raise PyperclipException('only str, int, float, and bool values can be copied to the clipboard, not %s' % (text.__class__.__name__))
-    return str(text)
+    return STR_OR_UNICODE(text)
 
 
 def init_osx_pbcopy_clipboard():

@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 # Dynamically calculate the version based on pyperclip.VERSION.
 setup(
     name='pyperclip',
-    version=__import__('pyperclip').__version__,
+    version=version,
     url='https://github.com/asweigart/pyperclip',
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
