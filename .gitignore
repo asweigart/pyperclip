@@ -1,4 +1,5 @@
 venv/
+.tox/
 
 *.pyc
 __pycache__/
