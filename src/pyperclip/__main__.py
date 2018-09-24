@@ -1,9 +1,9 @@
 import pyperclip
 import sys
 
-if sys.argv[1] in ('-c', '--copy'):
+if len(sys.argv) > 1 and sys.argv[1] in ('-c', '--copy'):
     pyperclip.copy(sys.stdin.read())
-elif sys.argv[1] in ('-p', '--paste'):
+elif len(sys.argv) > 1 and sys.argv[1] in ('-p', '--paste'):
     sys.stdout.write(pyperclip.paste())
 else:
     print('Usage: python -m pyperclip [-c | --copy] | [-p | --paste]')
