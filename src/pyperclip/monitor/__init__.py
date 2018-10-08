@@ -17,15 +17,28 @@ import time
 
 
 class Monitor(object):
+    """Main clipboard monitor class.
 
-    '''
-    '''
+    Used as an iterable, yields the clipboard content when changes.
+
+    """
+
     def __init__(self, warm_start=False):
-        self.warm_start = warm_start
+        """__init__ method.
+
+        Args:
+            warm_start (boolean): Determines whether the clipboard content when its iterated should be taken into account
+
+        """
+        self._warm_start = warm_start
 
     def __iter__(self):
+        """__iter__ method.
 
-        last = pyperclip.paste() if not self.warm_start else None
+        Yields the clibpoard content when changes.
+
+        """
+        last = pyperclip.paste() if not self._warm_start else None
 
         while True:
             if pyperclip.paste() == last:
