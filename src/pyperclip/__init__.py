@@ -47,6 +47,7 @@ __version__ = '1.7.0'
 
 import contextlib
 import ctypes
+import distutils
 import os
 import platform
 import subprocess
@@ -72,15 +73,8 @@ STR_OR_UNICODE = unicode if PY2 else str # For paste(): Python 3 uses str, Pytho
 
 ENCODING = 'utf-8'
 
-# The "which" unix command finds where a command is.
-if platform.system() == 'Windows':
-    WHICH_CMD = 'where'
-else:
-    WHICH_CMD = 'which'
-
 def _executable_exists(name):
-    return subprocess.call([WHICH_CMD, name],
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+    return distutils.spawn.find_executable(name)
 
 
 
