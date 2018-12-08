@@ -11,9 +11,11 @@ Brian Levin https://github.com/bnice5000
 Carvell Scott https://github.com/CarvellScott
 Cees Timmerman https://github.com/CTimmerman
 Chris Clark
+Christopher Lambert https://github.com/XN137
 Chris Woerz https://github.com/erendrake
 Edd Barrett https://github.com/vext01
 Eugene Yang https://github.com/eugene-yang
+Felix Yan https://github.com/felixonmars
 fthoma https://github.com/fthoma
 hinlader https://github.com/hinlader
 Hugo https://github.com/hugovk

@@ -1,3 +1,4 @@
+include *.md
 recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
