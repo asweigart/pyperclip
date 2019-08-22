@@ -16,9 +16,11 @@ Usage:
 On Windows, no additional modules are needed.
 On Mac, the pyobjc module is used, falling back to the pbcopy and pbpaste cli
     commands. (These commands should come with OS X.).
-On Linux, install xclip or xsel via package manager. For example, in Debian:
+On Linux, install xclip, xsel, or wl-clipboard (for "wayland" sessions) via package manager. 
+For example, in Debian:
     sudo apt-get install xclip
     sudo apt-get install xsel
+    sudo apt-get install wl-clipboard
 
 Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
 
@@ -37,6 +39,7 @@ Security Note: This module runs programs with these names:
     - pbpaste
     - xclip
     - xsel
+    - wl-copy/wl-paste
     - klipper
     - qdbus
 A malicious user could rename or add programs with these names, tricking
@@ -245,6 +248,33 @@ def init_xsel_clipboard():
         return stdout.decode(ENCODING)
 
     return copy_xsel, paste_xsel
+
+
+def init_wl_clipboard():
+    PRIMARY_SELECTION = "-p"
+
+    def copy_wl(text, primary=False):
+        text = _stringifyText(text)  # Converts non-str values to str.
+        args = ["wl-copy"]
+        if primary:
+            args.append(PRIMARY_SELECTION)
+        if not text:
+            args.append('--clear')
+            subprocess.check_call(args, close_fds=True)
+        else:
+            pass
+            p = subprocess.Popen(args, stdin=subprocess.PIPE, close_fds=True)
+            p.communicate(input=text.encode(ENCODING))
+
+    def paste_wl(primary=False):
+        args = ["wl-paste", "-n"]
+        if primary:
+            args.append(PRIMARY_SELECTION)
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, close_fds=True)
+        stdout, _stderr = p.communicate()
+        return stdout.decode(ENCODING)
+
+    return copy_wl, paste_wl
 
 
 def init_klipper_clipboard():
@@ -532,6 +562,11 @@ def determine_clipboard():
         else:
             return init_gtk_clipboard()
 
+        if (
+                os.environ["XDG_SESSION_TYPE"] == "wayland" and
+                _executable_exists("wl-copy")
+        ):
+            return init_wl_clipboard()
         if _executable_exists("xsel"):
             return init_xsel_clipboard()
         if _executable_exists("xclip"):
@@ -580,15 +615,18 @@ def set_clipboard(clipboard):
     '''
     global copy, paste
 
-    clipboard_types = {'pbcopy': init_osx_pbcopy_clipboard,
-                       'pyobjc': init_osx_pyobjc_clipboard,
-                       'gtk': init_gtk_clipboard,
-                       'qt': init_qt_clipboard, # TODO - split this into 'qtpy', 'pyqt4', and 'pyqt5'
-                       'xclip': init_xclip_clipboard,
-                       'xsel': init_xsel_clipboard,
-                       'klipper': init_klipper_clipboard,
-                       'windows': init_windows_clipboard,
-                       'no': init_no_clipboard}
+    clipboard_types = {
+        "pbcopy": init_osx_pbcopy_clipboard,
+        "pyobjc": init_osx_pyobjc_clipboard,
+        "gtk": init_gtk_clipboard,
+        "qt": init_qt_clipboard,  # TODO - split this into 'qtpy', 'pyqt4', and 'pyqt5'
+        "xclip": init_xclip_clipboard,
+        "xsel": init_xsel_clipboard,
+        "wl-clipboard": init_wl_clipboard,
+        "klipper": init_klipper_clipboard,
+        "windows": init_windows_clipboard,
+        "no": init_no_clipboard,
+    }
 
     if clipboard not in clipboard_types:
         raise ValueError('Argument must be one of %s' % (', '.join([repr(_) for _ in clipboard_types.keys()])))
