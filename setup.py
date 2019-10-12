@@ -17,7 +17,8 @@ setup(
     url='https://github.com/asweigart/pyperclip',
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
-    description=('A cross-platform clipboard module for Python. (Only handles plain text for now.)'),
+    description=(
+        'A cross-platform clipboard module for Python. (Only handles plain text for now.)'),
     long_description=long_description,
     license='BSD',
     packages=find_packages(where='src'),
@@ -43,5 +44,6 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
     ],
 )
