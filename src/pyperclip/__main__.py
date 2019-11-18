@@ -9,4 +9,5 @@ else:
     print('Usage: python -m pyperclip [-c | --copy] | [-p | --paste]')
     print()
     print('When copying, stdin will be placed on the clipboard.')
+    print('On Windows ^Z to trigger EOF and commit to memory. On Unix ^D')
     print('When pasting, the clipboard will be written to stdout.')
