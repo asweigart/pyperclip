@@ -13,10 +13,22 @@ Example Usage
     >>> pyperclip.paste()
     'The text to be copied to the clipboard.'
 
-
 Currently only handles plaintext.
 
-On Windows, no additional modules are needed.
+On Windows, no additional modules are needed. It also allows to access other clipboard formats other than the CF_UNICODETEXT.
+It does so while maintaining compatibility with the usage described above.
+
+    >>> import pyperclip
+    >>> pyperclip.copy(html_text, 49460)  # The HTML Format
+    >>> html_in_clipboard = pyperclip.paste(49460)
+
+Also, multiple formats can be copied if using
+
+    >>> pyperclip.copy({CF_UNICODETEXT: "this is the unicode text",
+                        CF_TEXT: b"This is the ascii text",
+                        CF_BITMAP: bitmap_image})
+    >>> paste_dict = pyperclip.paste([CF_TEXT, CF_UNICODETEXT])  # Pastes only these two
+    >>> paste_all = pyperclip.paste([])  # This pastes all available formats into a dictionary
 
 On Mac, this module makes use of the pbcopy and pbpaste commands, which should come with the os.
 
