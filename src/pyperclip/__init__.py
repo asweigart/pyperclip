@@ -535,6 +535,8 @@ def determine_clipboard():
             return init_xclip_clipboard()
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
+        if _executable_exists("pbcopy")
+            return init_osx_pbcopy_clipboard()
 
         try:
             # qtpy is a small abstraction layer that lets you write applications using a single api call to either PyQt or PySide.
