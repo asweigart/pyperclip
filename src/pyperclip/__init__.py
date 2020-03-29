@@ -64,7 +64,7 @@ HAS_DISPLAY = os.getenv("DISPLAY", False)
 
 EXCEPT_MSG = """
     Pyperclip could not find a copy/paste mechanism for your system.
-    For more information, please visit https://pyperclip.readthedocs.io/en/latest/introduction.html#not-implemented-error """
+    For more information, please visit https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error """
 
 PY2 = sys.version_info[0] == 2
 
