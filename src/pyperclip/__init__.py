@@ -43,7 +43,7 @@ A malicious user could rename or add programs with these names, tricking
 Pyperclip into running them with whatever permissions the Python process has.
 
 """
-__version__ = '1.7.0'
+__version__ = '1.8.0'
 
 import contextlib
 import ctypes
@@ -93,6 +93,8 @@ class PyperclipWindowsException(PyperclipException):
         message += " (%s)" % ctypes.WinError()
         super(PyperclipWindowsException, self).__init__(message)
 
+class PyperclipTimeoutException(PyperclipException):
+    pass
 
 def _stringifyText(text):
     if PY2:
@@ -648,6 +650,45 @@ def is_available():
 copy, paste = lazy_load_stub_copy, lazy_load_stub_paste
 
 
-__all__ = ['copy', 'paste', 'set_clipboard', 'determine_clipboard']
+
+def waitForPaste(timeout=None):
+    """This function call blocks until a non-empty text string exists on the
+    clipboard. It returns this text.
+
+    This function raises PyperclipTimeoutException if timeout was set to
+    a number of seconds that has elapsed without non-empty text being put on
+    the clipboard."""
+    startTime = time.time()
+    while True:
+        clipboardText = paste()
+        if clipboardText != '':
+            return clipboardText
+        time.sleep(0.01)
+
+        if timeout is not None and time.time() > startTime + timeout:
+            raise PyperclipTimeoutException('waitForPaste() timed out after ' + str(timeout) + ' seconds.')
+
+
+def waitForNewPaste(timeout=None):
+    """This function call blocks until a new text string exists on the
+    clipboard that is different from the text that was there when the function
+    was first called. It returns this text.
+
+    This function raises PyperclipTimeoutException if timeout was set to
+    a number of seconds that has elapsed without non-empty text being put on
+    the clipboard."""
+    startTime = time.time()
+    originalText = paste()
+    while True:
+        currentText = paste()
+        if currentText != originalText:
+            return currentText
+        time.sleep(0.01)
+
+        if timeout is not None and time.time() > startTime + timeout:
+            raise PyperclipTimeoutException('waitForNewPaste() timed out after ' + str(timeout) + ' seconds.')
+
+
+__all__ = ['copy', 'paste', 'waitForPaste', 'waitForNewPaste' 'set_clipboard', 'determine_clipboard']
 
 
