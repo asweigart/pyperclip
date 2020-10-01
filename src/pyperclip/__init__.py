@@ -689,6 +689,6 @@ def waitForNewPaste(timeout=None):
             raise PyperclipTimeoutException('waitForNewPaste() timed out after ' + str(timeout) + ' seconds.')
 
 
-__all__ = ['copy', 'paste', 'waitForPaste', 'waitForNewPaste' 'set_clipboard', 'determine_clipboard']
+__all__ = ['copy', 'paste', 'waitForPaste', 'waitForNewPaste', 'set_clipboard', 'determine_clipboard']
 
 
