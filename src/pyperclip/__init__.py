@@ -507,7 +507,7 @@ def determine_clipboard():
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
 
-    if platform.system() == 'Linux':
+    if platform.system() == 'Linux' and os.path.isfile('/proc/version'):
         with open('/proc/version', 'r') as f:
             if "microsoft" in f.read().lower():
                 return init_wsl_clipboard()
