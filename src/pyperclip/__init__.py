@@ -509,7 +509,7 @@ def determine_clipboard():
 
     if platform.system() == 'Linux':
         with open('/proc/version', 'r') as f:
-            if "Microsoft" in f.read():
+            if "microsoft" in f.read().lower():
                 return init_wsl_clipboard()
 
     # Setup for the MAC OS X platform:
