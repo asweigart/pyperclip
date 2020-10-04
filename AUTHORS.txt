@@ -17,17 +17,21 @@ Edd Barrett https://github.com/vext01
 Eugene Yang https://github.com/eugene-yang
 Felix Yan https://github.com/felixonmars
 fthoma https://github.com/fthoma
+Greg Witt https://github.com/GoodGuyGregory
 hinlader https://github.com/hinlader
 Hugo https://github.com/hugovk
 Hynek Cernoch https://github.com/hynekcer
 Jason R. Coombs https://github.com/jaraco
 Jon Crall https://github.com/Erotemic
 Jonathan Slenders https://github.com/jonathanslenders
+JustAShoeMaker https://github.com/JustAShoeMaker
 Marcelo Glezer https://github.com/gato
 Maximilian Hils https://github.com/mhils
+Michał Górny https://github.com/mgorny
 Nikolaos-Digenis Karagiannis https://github.com/Digenis
 Nils Ohlmeier https://github.com/nils-ohlmeier
 Orson Peters https://github.com/orlp
+pgajdos https://github.com/pgajdos
 Six https://github.com/brbsix
 Stefan Devai https://github.com/stefandevai
 Stefan Scherfke https://github.com/sscherfke
