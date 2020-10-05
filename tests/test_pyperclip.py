@@ -147,10 +147,10 @@ class TestGtk(_TestClipboard):
 class TestQt(_TestClipboard):
     if HAS_DISPLAY:
         try:
-            import PyQt5
+            import PyQt5.QtWidgets
         except ImportError:
             try:
-                import PyQt4
+                import PyQt4.QtGui
             except ImportError:
                 pass
             else:
