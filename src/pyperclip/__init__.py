@@ -16,7 +16,7 @@ Usage:
 On Windows, no additional modules are needed.
 On Mac, the pyobjc module is used, falling back to the pbcopy and pbpaste cli
     commands. (These commands should come with OS X.).
-On Linux, install xclip, xsel, or wl-clipboard (for "wayland" sessions) via package manager. 
+On Linux, install xclip, xsel, or wl-clipboard (for "wayland" sessions) via package manager.
 For example, in Debian:
     sudo apt-get install xclip
     sudo apt-get install xsel
