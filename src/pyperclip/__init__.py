@@ -46,7 +46,7 @@ A malicious user could rename or add programs with these names, tricking
 Pyperclip into running them with whatever permissions the Python process has.
 
 """
-__version__ = '1.8.0'
+__version__ = '1.8.1'
 
 import contextlib
 import ctypes

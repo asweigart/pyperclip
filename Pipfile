@@ -4,10 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pytest = "*"
+pyperclip = {editable = true, path = "."}
 
 [dev-packages]
 tox = "*"
 detox = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.9"
