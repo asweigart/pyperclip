@@ -149,18 +149,18 @@ def init_osx_pyobjc_clipboard():
 
 
 def init_gtk_clipboard():
-    global gtk
-    import gtk
+    global Clipboard
+    from gtk import Clipboard
 
     def copy_gtk(text):
         global cb
         text = _stringifyText(text) # Converts non-str values to str.
-        cb = gtk.Clipboard()
+        cb = Clipboard()
         cb.set_text(text)
         cb.store()
 
     def paste_gtk():
-        clipboardContents = gtk.Clipboard().wait_for_text()
+        clipboardContents = Clipboard().wait_for_text()
         # for python 2, returns None if the clipboard is blank.
         if clipboardContents is None:
             return ''
@@ -526,7 +526,7 @@ def determine_clipboard():
     accordingly.
     '''
 
-    global Foundation, AppKit, gtk, qtpy, PyQt4, PyQt5
+    global Foundation, AppKit, Clipboard, qtpy, PyQt4, PyQt5
 
     # Setup for the CYGWIN platform:
     if 'cygwin' in platform.system().lower(): # Cygwin has a variety of values returned by platform.system(), such as 'CYGWIN_NT-6.1'
@@ -558,7 +558,7 @@ def determine_clipboard():
     # Setup for the LINUX platform:
     if HAS_DISPLAY:
         try:
-            import gtk  # check if gtk is installed
+            from gtk import Clipboard  # check if gtk is installed
         except ImportError:
             pass # We want to fail fast for all non-ImportError exceptions.
         else:
