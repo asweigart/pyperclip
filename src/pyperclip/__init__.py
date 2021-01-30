@@ -519,7 +519,7 @@ def init_wsl_clipboard():
     return copy_wsl, paste_wsl
 
 
-# Automatic detection of clipboard mechanisms and importing is done in deteremine_clipboard():
+# Automatic detection of clipboard mechanisms and importing is done in determine_clipboard():
 def determine_clipboard():
     '''
     Determine the OS/platform and set the copy() and paste() functions
