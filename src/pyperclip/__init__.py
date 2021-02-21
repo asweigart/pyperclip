@@ -565,7 +565,7 @@ def determine_clipboard():
             return init_gtk_clipboard()
 
         if (
-                os.environ["XDG_SESSION_TYPE"] == "wayland" and
+                os.environ.get("WAYLAND_DISPLAY") and
                 _executable_exists("wl-copy")
         ):
             return init_wl_clipboard()
