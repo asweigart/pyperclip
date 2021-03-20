@@ -508,7 +508,8 @@ def init_wsl_clipboard():
         p.communicate(input=text.encode(ENCODING))
 
     def paste_wsl():
-        p = subprocess.Popen(['powershell.exe', '-command', 'Get-Clipboard'],
+        # '-noprofile' speeds up load time
+        p = subprocess.Popen(['powershell.exe', '-noprofile', '-command', 'Get-Clipboard'],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              close_fds=True)
