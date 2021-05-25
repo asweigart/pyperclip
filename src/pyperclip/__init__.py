@@ -555,7 +555,11 @@ def determine_clipboard():
         else:
             return init_osx_pyobjc_clipboard()
 
-    # Setup for the LINUX platform:
+    # Setup for wayland/wl-clipboard:
+    if (os.environ.get("WAYLAND_DISPLAY") and _executable_exists("wl-copy")):
+        return init_wl_clipboard()
+
+    # Setup for the LINUX platform (X11):
     if HAS_DISPLAY:
         try:
             import gtk  # check if gtk is installed
@@ -564,11 +568,6 @@ def determine_clipboard():
         else:
             return init_gtk_clipboard()
 
-        if (
-                os.environ.get("WAYLAND_DISPLAY") and
-                _executable_exists("wl-copy")
-        ):
-            return init_wl_clipboard()
         if _executable_exists("xsel"):
             return init_xsel_clipboard()
         if _executable_exists("xclip"):
