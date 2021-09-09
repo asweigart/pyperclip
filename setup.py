@@ -24,6 +24,7 @@ setup(
     package_dir={'': 'src'},
     test_suite='tests',
     keywords="clipboard copy paste clip xsel xclip",
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Win32 (MS Windows)',
