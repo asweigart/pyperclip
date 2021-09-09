@@ -1,4 +1,3 @@
-# coding: utf-8
 import string
 import unittest
 import random
@@ -59,24 +58,24 @@ class _TestClipboard(unittest.TestCase):
     def test_copy_unicode(self):
         if not self.supports_unicode:
             raise unittest.SkipTest()
-        self.copy(u"ಠ_ಠ")
+        self.copy("ಠ_ಠ")
 
     def test_copy_unicode_emoji(self):
         if not self.supports_unicode:
             raise unittest.SkipTest()
-        self.copy(u"🙆")
+        self.copy("🙆")
 
     def test_copy_paste_unicode(self):
         if not self.supports_unicode:
             raise unittest.SkipTest()
-        msg = u"ಠ_ಠ"
+        msg = "ಠ_ಠ"
         self.copy(msg)
         self.assertEqual(self.paste(), msg)
 
     def test_copy_paste_unicode_emoji(self):
         if not self.supports_unicode:
             raise unittest.SkipTest()
-        msg = u"🙆"
+        msg = "🙆"
         self.copy(msg)
         self.assertEqual(self.paste(), msg)
 
@@ -118,7 +117,7 @@ class TestWindows(_TestClipboard):
 
 class TestWSL(_TestClipboard):
     if platform.system() == 'Linux':
-        with open('/proc/version', 'r') as f:
+        with open('/proc/version') as f:
             if "Microsoft" in f.read():
                 clipboard = init_wsl_clipboard()
 

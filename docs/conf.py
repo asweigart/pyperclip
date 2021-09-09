@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # Pyperclip documentation build configuration file, created by
 # sphinx-quickstart on Fri Aug 15 22:34:37 2014.
