@@ -589,7 +589,8 @@ def determine_clipboard():
     if HAS_DISPLAY:
         # For GNOME Wayland
         # wl-clipboard causes screen flickering so we use gpaste if available
-        if os.getenv('XDG_CURRENT_DESKTOP') == 'GNOME' \
+        
+        if 'gnome' in os.getenv('XDG_CURRENT_DESKTOP').lower() \
                 and os.environ.get("WAYLAND_DISPLAY") \
                 and _executable_exists("gpaste-client"):
             return init_gpaste_clipboard()
