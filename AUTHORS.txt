@@ -13,19 +13,21 @@ Cees Timmerman https://github.com/CTimmerman
 Chris Clark
 Christopher Lambert https://github.com/XN137
 Chris Woerz https://github.com/erendrake
+Daniel Shimon https://github.com/daniel-shimon
 Edd Barrett https://github.com/vext01
 Eugene Yang https://github.com/eugene-yang
 Felix Yan https://github.com/felixonmars
 fthoma https://github.com/fthoma
 Greg Witt https://github.com/GoodGuyGregory
 hinlader https://github.com/hinlader
-Hugo https://github.com/hugovk
+Hugo van Kemenade https://github.com/hugovk
 Hynek Cernoch https://github.com/hynekcer
 Jason R. Coombs https://github.com/jaraco
 Jon Crall https://github.com/Erotemic
 Jonathan Slenders https://github.com/jonathanslenders
 JustAShoeMaker https://github.com/JustAShoeMaker
 Marcelo Glezer https://github.com/gato
+masajxxx https://github.com/masajxxx
 Maximilian Hils https://github.com/mhils
 Michał Górny https://github.com/mgorny
 Nikolaos-Digenis Karagiannis https://github.com/Digenis
