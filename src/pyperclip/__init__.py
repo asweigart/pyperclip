@@ -495,7 +495,10 @@ def init_windows_clipboard():
                 # (Also, it may return a handle to an empty buffer,
                 # but technically that's not empty)
                 return ""
-            return c_wchar_p(handle).value
+            locked_handle = safeGlobalLock(handle)
+            return_value = c_wchar_p(locked_handle).value
+            safeGlobalUnlock(handle)
+            return return_value
 
     return copy_windows, paste_windows
 
