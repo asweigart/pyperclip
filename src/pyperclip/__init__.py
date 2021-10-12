@@ -199,11 +199,11 @@ def init_qt_clipboard():
     return copy_qt, paste_qt
 
 
-def init_xclip_clipboard():
+def init_xclip_clipboard(primary=False):
     DEFAULT_SELECTION='c'
     PRIMARY_SELECTION='p'
 
-    def copy_xclip(text, primary=False):
+    def copy_xclip(text, primary=primary):
         text = _stringifyText(text) # Converts non-str values to str.
         selection=DEFAULT_SELECTION
         if primary:
@@ -212,7 +212,7 @@ def init_xclip_clipboard():
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode(ENCODING))
 
-    def paste_xclip(primary=False):
+    def paste_xclip(primary=primary):
         selection=DEFAULT_SELECTION
         if primary:
             selection=PRIMARY_SELECTION
@@ -227,11 +227,11 @@ def init_xclip_clipboard():
     return copy_xclip, paste_xclip
 
 
-def init_xsel_clipboard():
+def init_xsel_clipboard(primary=False):
     DEFAULT_SELECTION='-b'
     PRIMARY_SELECTION='-p'
 
-    def copy_xsel(text, primary=False):
+    def copy_xsel(text, primary=primary):
         text = _stringifyText(text) # Converts non-str values to str.
         selection_flag = DEFAULT_SELECTION
         if primary:
@@ -240,7 +240,7 @@ def init_xsel_clipboard():
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode(ENCODING))
 
-    def paste_xsel(primary=False):
+    def paste_xsel(primary=primary):
         selection_flag = DEFAULT_SELECTION
         if primary:
             selection_flag = PRIMARY_SELECTION
@@ -524,7 +524,7 @@ def init_wsl_clipboard():
 
 
 # Automatic detection of clipboard mechanisms and importing is done in deteremine_clipboard():
-def determine_clipboard():
+def determine_clipboard(primary=False):
     '''
     Determine the OS/platform and set the copy() and paste() functions
     accordingly.
@@ -574,9 +574,9 @@ def determine_clipboard():
         ):
             return init_wl_clipboard()
         if _executable_exists("xsel"):
-            return init_xsel_clipboard()
+            return init_xsel_clipboard(primary)
         if _executable_exists("xclip"):
-            return init_xclip_clipboard()
+            return init_xclip_clipboard(primary)
         if _executable_exists("klipper") and _executable_exists("qdbus"):
             return init_klipper_clipboard()
 
