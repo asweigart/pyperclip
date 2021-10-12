@@ -563,6 +563,9 @@ def determine_clipboard():
     if HAS_DISPLAY:
         try:
             import gtk  # check if gtk is installed
+            gtk.Clipboard()
+        except AttributeError:
+            pass
         except ImportError:
             pass # We want to fail fast for all non-ImportError exceptions.
         else:
