@@ -16,9 +16,11 @@ Usage:
 On Windows, no additional modules are needed.
 On Mac, the pyobjc module is used, falling back to the pbcopy and pbpaste cli
     commands. (These commands should come with OS X.).
-On Linux, install xclip or xsel via package manager. For example, in Debian:
+On Linux, install xclip, xsel, or wl-clipboard (for "wayland" sessions) via package manager.
+For example, in Debian:
     sudo apt-get install xclip
     sudo apt-get install xsel
+    sudo apt-get install wl-clipboard
 
 Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
 
@@ -37,13 +39,14 @@ Security Note: This module runs programs with these names:
     - pbpaste
     - xclip
     - xsel
+    - wl-copy/wl-paste
     - klipper
     - qdbus
 A malicious user could rename or add programs with these names, tricking
 Pyperclip into running them with whatever permissions the Python process has.
 
 """
-__version__ = '1.7.0'
+__version__ = '1.8.2'
 
 import contextlib
 import ctypes
@@ -72,17 +75,18 @@ STR_OR_UNICODE = unicode if PY2 else str  # For paste(): Python 3 uses str, Pyth
 
 ENCODING = 'utf-8'
 
-# The "which" unix command finds where a command is.
-if platform.system() == 'Windows':
-    WHICH_CMD = 'where'
-else:
-    WHICH_CMD = 'which'
-
+try:
+    from shutil import which as _executable_exists
+except ImportError:
+    # The "which" unix command finds where a command is.
+    if platform.system() == 'Windows':
+        WHICH_CMD = 'where'
+    else:
+        WHICH_CMD = 'which'
 
 def _executable_exists(name):
     return subprocess.call([WHICH_CMD, name],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-
 
 # Exceptions
 class PyperclipException(RuntimeError):
@@ -94,6 +98,8 @@ class PyperclipWindowsException(PyperclipException):
         message += " (%s)" % ctypes.WinError()
         super(PyperclipWindowsException, self).__init__(message)
 
+class PyperclipTimeoutException(PyperclipException):
+    pass
 
 def _stringifyText(text):
     if PY2:
@@ -243,6 +249,33 @@ def init_xsel_clipboard():
         return stdout.decode(ENCODING)
 
     return copy_xsel, paste_xsel
+
+
+def init_wl_clipboard():
+    PRIMARY_SELECTION = "-p"
+
+    def copy_wl(text, primary=False):
+        text = _stringifyText(text)  # Converts non-str values to str.
+        args = ["wl-copy"]
+        if primary:
+            args.append(PRIMARY_SELECTION)
+        if not text:
+            args.append('--clear')
+            subprocess.check_call(args, close_fds=True)
+        else:
+            pass
+            p = subprocess.Popen(args, stdin=subprocess.PIPE, close_fds=True)
+            p.communicate(input=text.encode(ENCODING))
+
+    def paste_wl(primary=False):
+        args = ["wl-paste", "-n"]
+        if primary:
+            args.append(PRIMARY_SELECTION)
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, close_fds=True)
+        stdout, _stderr = p.communicate()
+        return stdout.decode(ENCODING)
+
+    return copy_wl, paste_wl
 
 
 def init_klipper_clipboard():
@@ -402,75 +435,77 @@ def init_windows_clipboard():
 
     # Standard Clipboard Formats in Windows
     # Constant = value          # Description
-    CF_BITMAP = 2  # A handle to a bitmap (HBITMAP).
-    CF_DIB = 8  # A memory object containing a BITMAPINFO structure followed by the bitmap bits.
-    CF_DIBV5 = 17  # A memory object containing a BITMAPV5HEADER structure followed by the bitmap color
-    #              space information and the bitmap bits.
-    CF_DIF = 5  # Software Arts' Data Interchange Format.
-    CF_DSPBITMAP = 0x0082  # Bitmap display format associated with a private format. The hMem parameter must be a
-    #                      handle to data that can be displayed in bitmap format in lieu of the privately
-    #                      formatted data.
+    CF_BITMAP = 2               # A handle to a bitmap (HBITMAP).
+    CF_DIB = 8                  # A memory object containing a BITMAPINFO structure followed by the bitmap bits.
+    CF_DIBV5 = 17               # A memory object containing a BITMAPV5HEADER structure followed by the bitmap color
+                                # space information and the bitmap bits.
+    CF_DIF = 5                  # Software Arts' Data Interchange Format.
+    CF_DSPBITMAP = 0x0082       # Bitmap display format associated with a private format. The hMem parameter must be a
+                                # handle to data that can be displayed in bitmap format in lieu of the privately
+                                # formatted data.
     CF_DSPENHMETAFILE = 0x008E  # Enhanced metafile display format associated with a private format.
-    #                           The hMem parameter must be a handle to data that can be displayed in enhanced metafile
-    #                           format in lieu of the privately formatted data.
-    CF_DSPMETAFILEPICT = 0x0083  # Metafile-picture display format associated with a private format. The hMem parameter
-    #                            must be a handle to data that can be displayed in metafile-picture format in lieu of
-    #                            the privately formatted data.
-    CF_DSPTEXT = 0x0081  # Text display format associated with a private format. The hMem parameter must be a
-    #                    handle to data that can be displayed in text format in lieu of the privately formatted data.
-    CF_ENHMETAFILE = 14  # A handle to an enhanced metafile (HENHMETAFILE).
-    CF_GDIOBJFIRST = 0x0300  # Start of a range of integer values for application-defined GDI object clipboard
-    #                        formats. The end of the range is CF_GDIOBJLAST.
-    #                        Handles associated with clipboard formats in this range are not automatically deleted
-    #                        using the GlobalFree function when the clipboard is emptied. Also, when using values
-    #                        in this range, the hMem parameter is not a handle to a GDI object, but is a handle
-    #                        allocated by the GlobalAlloc function with the GMEM_MOVEABLE flag.
-    CF_GDIOBJLAST = 0x03FF  # See CF_GDIOBJFIRST.
-    CF_HDROP = 15  # A handle to type HDROP that identifies a list of files. An application can retrieve
-    #              information about the files by passing the handle to the DragQueryFile function.
-    CF_LOCALE = 16  # The data is a handle to the locale identifier associated with text in the clipboard.
-    #                When you close the clipboard, if it contains CF_TEXT data but no CF_LOCALE data, the
-    #                system automatically sets the CF_LOCALE format to the current input language. You can
-    #                use the CF_LOCALE format to associate a different locale with the clipboard text.
-    #                An application that pastes text from the clipboard can retrieve this format to
-    #                determine which character set was used to generate the text.
-    #                Note that the clipboard does not support plain text in multiple character sets.
-    #                To achieve this, use a formatted text data type such as RTF instead.
-    #                The system uses the code page associated with CF_LOCALE to implicitly convert from
-    #                CF_TEXT to CF_UNICODETEXT. Therefore, the correct code page table is used for the
-    #                conversion.
-    CF_METAFILEPICT = 3  # Handle to a metafile picture format as defined by the METAFILEPICT structure. When
-    #                    passing a CF_METAFILEPICT handle by means of DDE, the application responsible for
-    #                    deleting hMem should also free the metafile referred to by the CF_METAFILEPICT handle.
-    CF_OEMTEXT = 7  # Text format containing characters in the OEM character set. Each line ends with a
-    #               carriage return/linefeed (CR-LF) combination. A null character signals the end of the
-    #               data.
-    CF_OWNERDISPLAY = 0x0080  # Owner-display format. The clipboard owner must display and update the clipboard viewer
-    #                         window, and receive the WM_ASKCBFORMATNAME, WM_HSCROLLCLIPBOARD, WM_PAINTCLIPBOARD,
-    #                         WM_SIZECLIPBOARD, and WM_VSCROLLCLIPBOARD messages. The hMem parameter must be NULL.
-    CF_PALETTE = 9  # Handle to a color palette. Whenever an application places data in the clipboard that
-    #               depends on or assumes a color palette, it should place the palette on the clipboard as
-    #               well.
-    #               If the clipboard contains data in the CF_PALETTE (logical color palette) format, the
-    #               application should use the SelectPalette and RealizePalette functions to realize
-    #               (compare) any other data in the clipboard against that logical palette.
-    #               When displaying clipboard data, the clipboard always uses as its current palette any
-    #               object on the clipboard that is in the CF_PALETTE format.
-    CF_PENDATA = 10  # Data for the pen extensions to the Microsoft Windows for Pen Computing.
-    CF_PRIVATEFIRST = 0x0200  # Start of a range of integer values for private clipboard formats. The range ends with
-    #                         CF_PRIVATELAST. Handles associated with private clipboard formats are not freed
-    #                         automatically; the clipboard owner must free such handles, typically in response to
-    #                         the WM_DESTROYCLIPBOARD message.
-    CF_PRIVATELAST = 0x02FF  # See CF_PRIVATEFIRST.
-    CF_RIFF = 11  # Represents audio data more complex than can be represented in a CF_WAVE standard wave format.
-    CF_SYLK = 4  # Microsoft Symbolic Link (SYLK) format.
-    CF_TEXT = 1  # Text format. Each line ends with a carriage return/linefeed (CR-LF) combination.
-    #            A null character signals the end of the data. Use this format for ANSI text.
-    CF_TIFF = 6  # Tagged-image file format.
-    CF_UNICODETEXT = 13  # Unicode text format. Each line ends with a carriage return/linefeed (CR-LF)
-    #                    combination. A null character signals the end of the data.
-    CF_WAVE = 12  # Represents audio data in one of the standard wave formats, such as 11 kHz or
-    #             22 kHz PCM.
+                                # The hMem parameter must be a handle to data that can be displayed in enhanced metafile
+                                # format in lieu of the privately formatted data.
+    CF_DSPMETAFILEPICT = 0x0083 # Metafile-picture display format associated with a private format. The hMem parameter
+                                # must be a handle to data that can be displayed in metafile-picture format in lieu of
+                                # the privately formatted data.
+    CF_DSPTEXT = 0x0081         # Text display format associated with a private format. The hMem parameter must be a
+                                # handle to data that can be displayed in text format in lieu of the privately formatted
+                                # data.
+    CF_ENHMETAFILE = 14         # A handle to an enhanced metafile (HENHMETAFILE).
+    CF_GDIOBJFIRST = 0x0300     # Start of a range of integer values for application-defined GDI object clipboard
+                                # formats. The end of the range is CF_GDIOBJLAST.
+                                # Handles associated with clipboard formats in this range are not automatically deleted
+                                # using the GlobalFree function when the clipboard is emptied. Also, when using values
+                                # in this range, the hMem parameter is not a handle to a GDI object, but is a handle
+                                # allocated by the GlobalAlloc function with the GMEM_MOVEABLE flag.
+    CF_GDIOBJLAST = 0x03FF      # See CF_GDIOBJFIRST.
+    CF_HDROP = 15               # A handle to type HDROP that identifies a list of files. An application can retrieve
+                                # information about the files by passing the handle to the DragQueryFile function.
+    CF_LOCALE = 16              # The data is a handle to the locale identifier associated with text in the clipboard.
+                                # When you close the clipboard, if it contains CF_TEXT data but no CF_LOCALE data, the
+                                # system automatically sets the CF_LOCALE format to the current input language. You can
+                                # use the CF_LOCALE format to associate a different locale with the clipboard text.
+                                # An application that pastes text from the clipboard can retrieve this format to
+                                # determine which character set was used to generate the text.
+                                # Note that the clipboard does not support plain text in multiple character sets.
+                                # To achieve this, use a formatted text data type such as RTF instead.
+                                # The system uses the code page associated with CF_LOCALE to implicitly convert from
+                                # CF_TEXT to CF_UNICODETEXT. Therefore, the correct code page table is used for the
+                                # conversion.
+    CF_METAFILEPICT = 3         # Handle to a metafile picture format as defined by the METAFILEPICT structure. When
+                                # passing a CF_METAFILEPICT handle by means of DDE, the application responsible for
+                                # deleting hMem should also free the metafile referred to by the CF_METAFILEPICT handle.
+    CF_OEMTEXT = 7              # Text format containing characters in the OEM character set. Each line ends with a
+                                # carriage return/linefeed (CR-LF) combination. A null character signals the end of the
+                                # data.
+    CF_OWNERDISPLAY = 0x0080    # Owner-display format. The clipboard owner must display and update the clipboard viewer
+                                # window, and receive the WM_ASKCBFORMATNAME, WM_HSCROLLCLIPBOARD, WM_PAINTCLIPBOARD,
+                                # WM_SIZECLIPBOARD, and WM_VSCROLLCLIPBOARD messages. The hMem parameter must be NULL.
+    CF_PALETTE = 9              # Handle to a color palette. Whenever an application places data in the clipboard that
+                                # depends on or assumes a color palette, it should place the palette on the clipboard as
+                                # well.
+                                # If the clipboard contains data in the CF_PALETTE (logical color palette) format, the
+                                # application should use the SelectPalette and RealizePalette functions to realize
+                                # (compare) any other data in the clipboard against that logical palette.
+                                # When displaying clipboard data, the clipboard always uses as its current palette any
+                                # object on the clipboard that is in the CF_PALETTE format.
+    CF_PENDATA = 10             # Data for the pen extensions to the Microsoft Windows for Pen Computing.
+    CF_PRIVATEFIRST = 0x0200    # Start of a range of integer values for private clipboard formats. The range ends with
+                                # CF_PRIVATELAST. Handles associated with private clipboard formats are not freed
+                                # automatically; the clipboard owner must free such handles, typically in response to
+                                # the WM_DESTROYCLIPBOARD message.
+    CF_PRIVATELAST = 0x02FF     # See CF_PRIVATEFIRST.
+    CF_RIFF = 11                # Represents audio data more complex than can be represented in a CF_WAVE standard wave
+                                # format.
+    CF_SYLK = 4                 # Microsoft Symbolic Link (SYLK) format.
+    CF_TEXT = 1                 # Text format. Each line ends with a carriage return/linefeed (CR-LF) combination.
+                                # A null character signals the end of the data. Use this format for ANSI text.
+    CF_TIFF = 6                 # Tagged-image file format.
+    CF_UNICODETEXT = 13         # Unicode text format. Each line ends with a carriage return/linefeed (CR-LF)
+                                # combination. A null character signals the end of the data.
+    CF_WAVE = 12                # Represents audio data in one of the standard wave formats, such as 11 kHz or
+                                # 22 kHz PCM.
 
     CF_ALL = []  # If passing an iterable to the paste function, it will retrieve all available formats
 
@@ -651,7 +686,8 @@ def init_wsl_clipboard():
         p.communicate(input=text.encode(ENCODING))
 
     def paste_wsl():
-        p = subprocess.Popen(['powershell.exe', '-command', 'Get-Clipboard'],
+        # '-noprofile' speeds up load time
+        p = subprocess.Popen(['powershell.exe', '-noprofile', '-command', 'Get-Clipboard'],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              close_fds=True)
@@ -685,9 +721,9 @@ def determine_clipboard():
     elif os.name == 'nt' or platform.system() == 'Windows':
         return init_windows_clipboard()
 
-    if platform.system() == 'Linux':
+    if platform.system() == 'Linux' and os.path.isfile('/proc/version'):
         with open('/proc/version', 'r') as f:
-            if "Microsoft" in f.read():
+            if "microsoft" in f.read().lower():
                 return init_wsl_clipboard()
 
     # Setup for the MAC OS X platform:
@@ -709,6 +745,11 @@ def determine_clipboard():
         else:
             return init_gtk_clipboard()
 
+        if (
+                os.environ.get("WAYLAND_DISPLAY") and
+                _executable_exists("wl-copy")
+        ):
+            return init_wl_clipboard()
         if _executable_exists("xsel"):
             return init_xsel_clipboard()
         if _executable_exists("xclip"):
@@ -757,15 +798,18 @@ def set_clipboard(clipboard):
     """
     global copy, paste
 
-    clipboard_types = {'pbcopy': init_osx_pbcopy_clipboard,
-                       'pyobjc': init_osx_pyobjc_clipboard,
-                       'gtk': init_gtk_clipboard,
-                       'qt': init_qt_clipboard,  # TODO - split this into 'qtpy', 'pyqt4', and 'pyqt5'
-                       'xclip': init_xclip_clipboard,
-                       'xsel': init_xsel_clipboard,
-                       'klipper': init_klipper_clipboard,
-                       'windows': init_windows_clipboard,
-                       'no': init_no_clipboard}
+    clipboard_types = {
+        "pbcopy": init_osx_pbcopy_clipboard,
+        "pyobjc": init_osx_pyobjc_clipboard,
+        "gtk": init_gtk_clipboard,
+        "qt": init_qt_clipboard,  # TODO - split this into 'qtpy', 'pyqt4', and 'pyqt5'
+        "xclip": init_xclip_clipboard,
+        "xsel": init_xsel_clipboard,
+        "wl-clipboard": init_wl_clipboard,
+        "klipper": init_klipper_clipboard,
+        "windows": init_windows_clipboard,
+        "no": init_no_clipboard,
+    }
 
     if clipboard not in clipboard_types:
         raise ValueError('Argument must be one of %s' % (', '.join([repr(_) for _ in clipboard_types.keys()])))
@@ -831,4 +875,43 @@ def is_available():
 # set_clipboard() or determine_clipboard() is called first.
 copy, paste = lazy_load_stub_copy, lazy_load_stub_paste
 
-__all__ = ['copy', 'paste', 'set_clipboard', 'determine_clipboard']
+
+def waitForPaste(timeout=None):
+    """This function call blocks until a non-empty text string exists on the
+    clipboard. It returns this text.
+
+    This function raises PyperclipTimeoutException if timeout was set to
+    a number of seconds that has elapsed without non-empty text being put on
+    the clipboard."""
+    startTime = time.time()
+    while True:
+        clipboardText = paste()
+        if clipboardText != '':
+            return clipboardText
+        time.sleep(0.01)
+
+        if timeout is not None and time.time() > startTime + timeout:
+            raise PyperclipTimeoutException('waitForPaste() timed out after ' + str(timeout) + ' seconds.')
+
+
+def waitForNewPaste(timeout=None):
+    """This function call blocks until a new text string exists on the
+    clipboard that is different from the text that was there when the function
+    was first called. It returns this text.
+
+    This function raises PyperclipTimeoutException if timeout was set to
+    a number of seconds that has elapsed without non-empty text being put on
+    the clipboard."""
+    startTime = time.time()
+    originalText = paste()
+    while True:
+        currentText = paste()
+        if currentText != originalText:
+            return currentText
+        time.sleep(0.01)
+
+        if timeout is not None and time.time() > startTime + timeout:
+            raise PyperclipTimeoutException('waitForNewPaste() timed out after ' + str(timeout) + ' seconds.')
+
+
+__all__ = ['copy', 'paste', 'waitForPaste', 'waitForNewPaste', 'set_clipboard', 'determine_clipboard']
