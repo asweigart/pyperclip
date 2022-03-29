@@ -120,11 +120,11 @@ def init_osx_pbcopy_clipboard():
                              stdin=subprocess.PIPE, close_fds=True)
         p.communicate(input=text.encode(ENCODING))
 
-    def paste_osx_pbcopy():
+    def paste_osx_pbcopy(errors='strict'):
         p = subprocess.Popen(['pbpaste', 'r'],
                              stdout=subprocess.PIPE, close_fds=True)
         stdout, stderr = p.communicate()
-        return stdout.decode(ENCODING)
+        return stdout.decode(ENCODING, errors)
 
     return copy_osx_pbcopy, paste_osx_pbcopy
 
