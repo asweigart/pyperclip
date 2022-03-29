@@ -1,3 +1,15 @@
+v1.7.0, 2018/09/24 -- Added ability to read/write clipboard by running `python -m pyperclip`
+v1.6.5, 2018/09/24 -- Fix for issue #129, where unicode text caused exceptions on Python 2.
+v1.6.4, 2018/07/18 -- Adjusted setup.py to include the long description.
+v1.6.3, 2018/07/18 -- Adjusted setup.py to include the long description.
+v1.6.2, 2018/07/18 -- Adjusted setup.py to include the long description.
+v1.6.1, 2018/07/18 -- Adjusted setup.py to include the long description.
+v1.6.1, 2018/05/23 -- Added Windows subsystem for Linux support.
+v1.5.32, 2017/10/29 -- Added limited cygwin support.
+v1.5.31, 2017/10/29 -- Fixed another mistake where 'posix' was checked for OS X instead of 'mac' due to a mistaken merge. Added lazy loading.
+v1.5.30, 2017/10/29 -- Fixed the encoding that was set to "uft-8"
+v1.5.29, 2017/10/29 -- Pyperclip works with qtpy module, osx can use objc now, set pyqt as lower priority than xsel/xclip/klipper, add support for PyQt5
+v1.5.28, 2017/10/28 -- Capture stderr of xclip subprocess, fixed issue #88 where emojii cut off the last character, allowed selection between PRIMARY and CLIPBOARD for xsel and xclip
 v1.5.27, 2016/03/14 -- Disable broken cygwin implementation until issue 55 can be fixed
 v1.5.26, 2016/01/20 -- Fix #51, Replace wcscpy_s with memmove for Windows XP.
 v1.5.25, 2015/12/13 -- Fix #53, PEP8 changes, STRING_FUNCTION rename

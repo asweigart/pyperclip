@@ -1,19 +1,29 @@
+import re
+from setuptools import setup, find_packages
 
-from setuptools import setup
+# Load version from module (without loading the whole module)
+with open('src/pyperclip/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        fd.read(), re.MULTILINE).group(1)
 
+# Read in the README.md for the long description.
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 # Dynamically calculate the version based on pyperclip.VERSION.
 setup(
     name='pyperclip',
-    version=__import__('pyperclip').__version__,
+    version=version,
     url='https://github.com/asweigart/pyperclip',
     author='Al Sweigart',
     author_email='al@inventwithpython.com',
-    description=('A cross-platform clipboard module for Python. (only handles plain text for now)'),
+    description=('A cross-platform clipboard module for Python. (Only handles plain text for now.)'),
+    long_description=long_description,
     license='BSD',
-    packages=['pyperclip'],
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
     test_suite='tests',
-    keywords="gui automation test testing keyboard mouse cursor click press keystroke control",
+    keywords="clipboard copy paste clip xsel xclip",
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Win32 (MS Windows)',
@@ -32,5 +42,9 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 )
