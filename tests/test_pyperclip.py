@@ -139,12 +139,7 @@ class TestQt(_TestClipboard):
         try:
             import PyQt5.QtWidgets
         except ImportError:
-            try:
-                import PyQt4.QtGui
-            except ImportError:
-                pass
-            else:
-                clipboard = init_qt_clipboard()
+            pass
         else:
             clipboard = init_qt_clipboard()
 
