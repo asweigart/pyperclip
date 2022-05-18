@@ -148,28 +148,6 @@ def init_osx_pyobjc_clipboard():
     return copy_osx_pyobjc, paste_osx_pyobjc
 
 
-def init_gtk_clipboard():
-    global gtk
-    import gtk
-
-    def copy_gtk(text):
-        global cb
-        text = _stringifyText(text) # Converts non-str values to str.
-        cb = gtk.Clipboard()
-        cb.set_text(text)
-        cb.store()
-
-    def paste_gtk():
-        clipboardContents = gtk.Clipboard().wait_for_text()
-        # for python 2, returns None if the clipboard is blank.
-        if clipboardContents is None:
-            return ''
-        else:
-            return clipboardContents
-
-    return copy_gtk, paste_gtk
-
-
 def init_qt_clipboard():
     global QApplication
     # $DISPLAY should exist
@@ -561,13 +539,6 @@ def determine_clipboard():
 
     # Setup for the LINUX platform:
     if HAS_DISPLAY:
-        try:
-            import gtk  # check if gtk is installed
-        except ImportError:
-            pass # We want to fail fast for all non-ImportError exceptions.
-        else:
-            return init_gtk_clipboard()
-
         if (
                 os.environ.get("WAYLAND_DISPLAY") and
                 _executable_exists("wl-copy")
@@ -624,7 +595,6 @@ def set_clipboard(clipboard):
     clipboard_types = {
         "pbcopy": init_osx_pbcopy_clipboard,
         "pyobjc": init_osx_pyobjc_clipboard,
-        "gtk": init_gtk_clipboard,
         "qt": init_qt_clipboard,  # TODO - split this into 'qtpy', 'pyqt4', and 'pyqt5'
         "xclip": init_xclip_clipboard,
         "xsel": init_xsel_clipboard,

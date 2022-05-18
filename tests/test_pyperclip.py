@@ -11,7 +11,7 @@ import platform
 from pyperclip import _executable_exists, HAS_DISPLAY
 from pyperclip import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
                                   init_dev_clipboard_clipboard,
-                                  init_gtk_clipboard, init_qt_clipboard,
+                                  init_qt_clipboard,
                                   init_xclip_clipboard, init_xsel_clipboard,
                                   init_wl_clipboard,
                                   init_klipper_clipboard, init_no_clipboard)
@@ -132,16 +132,6 @@ class TestOSX(_TestClipboard):
             clipboard = init_osx_pbcopy_clipboard() # TODO
         else:
             clipboard = init_osx_pyobjc_clipboard()
-
-
-class TestGtk(_TestClipboard):
-    if HAS_DISPLAY:
-        try:
-            import gtk
-        except ImportError:
-            pass
-        else:
-            clipboard = init_gtk_clipboard()
 
 
 class TestQt(_TestClipboard):
