@@ -536,8 +536,8 @@ def determine_clipboard():
     # Setup for the LINUX platform:
     if HAS_DISPLAY:
         if (
-                os.environ.get("WAYLAND_DISPLAY") and
-                _executable_exists("wl-copy")
+            os.environ.get("WAYLAND_DISPLAY") and
+            _executable_exists("wl-copy")
         ):
             return init_wl_clipboard()
         if _executable_exists("xsel"):
@@ -552,17 +552,16 @@ def determine_clipboard():
             # applications using a single api call to either PyQt or PySide.
             # https://pypi.python.org/pypi/QtPy
             import qtpy  # check if qtpy is installed
-        except ImportError:
-            # If qtpy isn't installed, fall back on importing PyQt5.
-            try:
-                import PyQt5  # check if PyQt5 is installed
-            except ImportError:
-                # We want to fail fast for all non-ImportError exceptions.
-                pass
-            else:
-                return init_qt_clipboard()
-        else:
             return init_qt_clipboard()
+        except ImportError:
+            pass
+
+        # If qtpy isn't installed, fall back on importing PyQt5
+        try:
+            import PyQt5  # check if PyQt5 is installed
+            return init_qt_clipboard()
+        except ImportError:
+            pass
 
     return init_no_clipboard()
 
