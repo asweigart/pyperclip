@@ -24,7 +24,7 @@ On Mac, this module makes use of the pbcopy and pbpaste commands, which should c
 
 On Linux, this module makes use of the xclip or xsel commands, which should come with the os. Otherwise run "sudo apt-get install xclip" or "sudo apt-get install xsel" (Note: xsel does not always seem to work.)
 
-Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
+Otherwise on Linux, you will need the qtpy or PyQT5 modules installed.
 
 Support
 -------
