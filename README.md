@@ -26,6 +26,12 @@ On Linux, this module makes use of the xclip or xsel commands, which should come
 
 Otherwise on Linux, you will need the gtk or PyQt4 modules installed.
 
+Building
+--------
+
+1. `pip install build`
+2. `python -m build -s`
+
 Support
 -------
 
