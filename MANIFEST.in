@@ -1,8 +1,0 @@
-include *.md
-include *.txt
-recursive-include docs *.bat
-recursive-include docs *.py
-recursive-include docs *.rst
-recursive-include docs Makefile
-recursive-include pyperclip *.py
-recursive-include tests *.py
