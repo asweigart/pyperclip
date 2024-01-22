@@ -269,7 +269,7 @@ def init_wl_clipboard():
             p.communicate(input=text.encode(ENCODING))
 
     def paste_wl(primary=False):
-        args = ["wl-paste", "-n"]
+        args = ["wl-paste", "-n", "-t", "text"]
         if primary:
             args.append(PRIMARY_SELECTION)
         p = subprocess.Popen(args, stdout=subprocess.PIPE, close_fds=True)
