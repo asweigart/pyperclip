@@ -7,7 +7,7 @@
 from typing import Callable, Optional
 
 # All and only those functions listed in __all__ are given
-# type annotated signatures here. 
+# type annotated signatures here.
 
 
 def copy(text: str) -> None: ...
