@@ -1,5 +1,5 @@
 """
 To maintain compatibility with Python versions that do
 not support type hinting, the type hints are provided in the
-PEP 561 stub file src/__init__.py
+PEPs 484 and 561 stub file src/__init__.py
 """
