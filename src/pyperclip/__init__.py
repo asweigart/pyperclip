@@ -566,7 +566,8 @@ def determine_clipboard():
         except ImportError:
             pass # We want to fail fast for all non-ImportError exceptions.
         else:
-            return init_gtk_clipboard()
+            if "gi.repository" not in gtk.__name__: 
+                return init_gtk_clipboard()
 
         if (
                 os.environ.get("WAYLAND_DISPLAY") and
