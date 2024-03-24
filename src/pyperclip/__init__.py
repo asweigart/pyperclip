@@ -48,6 +48,7 @@ Pyperclip into running them with whatever permissions the Python process has.
 """
 __version__ = '1.8.2'
 
+import base64
 import contextlib
 import ctypes
 import os
@@ -504,21 +505,39 @@ def init_windows_clipboard():
 
 
 def init_wsl_clipboard():
+
     def copy_wsl(text):
-        text = _stringifyText(text) # Converts non-str values to str.
-        p = subprocess.Popen(['clip.exe'],
-                             stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=text.encode(ENCODING))
+        text = _stringifyText(text)
+        base64_text = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+        ps_script = f"$text = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{base64_text}')); " \
+                    f"Set-Clipboard -Value $text"
+        # '-noprofile' speeds up load time
+        p = subprocess.Popen(['powershell.exe', '-noprofile', '-command', ps_script],
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+        stdout, stderr = p.communicate()
+
+        if stderr:
+            raise Exception(f"Error copying to clipboard: {stderr.decode('utf-8')}")
 
     def paste_wsl():
+        ps_script = '[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((Get-Clipboard -Raw)))'
+
         # '-noprofile' speeds up load time
-        p = subprocess.Popen(['powershell.exe', '-noprofile', '-command', 'Get-Clipboard'],
+        p = subprocess.Popen(['powershell.exe', '-noprofile', '-command', ps_script],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              close_fds=True)
         stdout, stderr = p.communicate()
-        # WSL appends "\r\n" to the contents.
-        return stdout[:-2].decode(ENCODING)
+
+        if stderr:
+            raise Exception(f"Error pasting from clipboard: {stderr}")
+
+        try:
+            base64_encoded = stdout.decode('utf-8').strip()
+            decoded_bytes = base64.b64decode(base64_encoded)
+            return decoded_bytes.decode('utf-8')
+        except Exception as e:
+            raise RuntimeError(f"Decoding error: {e}")
 
     return copy_wsl, paste_wsl
 
