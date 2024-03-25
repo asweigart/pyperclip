@@ -507,17 +507,10 @@ def init_windows_clipboard():
 def init_wsl_clipboard():
 
     def copy_wsl(text):
-        text = _stringifyText(text)
-        base64_text = base64.b64encode(text.encode('utf-8')).decode('utf-8')
-        ps_script = f"$text = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{base64_text}')); " \
-                    f"Set-Clipboard -Value $text"
-        # '-noprofile' speeds up load time
-        p = subprocess.Popen(['powershell.exe', '-noprofile', '-command', ps_script],
-                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
-        stdout, stderr = p.communicate()
-
-        if stderr:
-            raise Exception(f"Error copying to clipboard: {stderr.decode('utf-8')}")
+        text = _stringifyText(text) # Converts non-str values to str.
+        p = subprocess.Popen(['clip.exe'],
+                             stdin=subprocess.PIPE, close_fds=True)
+        p.communicate(input=text.encode('utf-16le'))
 
     def paste_wsl():
         ps_script = '[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((Get-Clipboard -Raw)))'
