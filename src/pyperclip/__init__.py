@@ -22,10 +22,9 @@ For example, in Debian:
     sudo apt-get install xsel
     sudo apt-get install wl-clipboard
 
-Otherwise on Linux, you will need the gtk or PyQt5/PyQt4 modules installed.
+Otherwise on Linux, you will need the qtpy or PyQt5 modules installed.
 
-gtk and PyQt4 modules are not available for Python 3,
-and this module does not work with PyGObject yet.
+This module does not work with PyGObject yet.
 
 Note: There seems to be a way to get gtk on Python 3, according to:
     https://askubuntu.com/questions/697397/python3-is-not-supporting-gtk-module
@@ -133,40 +132,15 @@ def init_osx_pyobjc_clipboard():
     return copy_osx_pyobjc, paste_osx_pyobjc
 
 
-def init_gtk_clipboard():
-    global gtk
-    import gtk
-
-    def copy_gtk(text):
-        global cb
-        text = _PYTHON_STR_TYPE(text) # Converts non-str values to str.
-        cb = gtk.Clipboard()
-        cb.set_text(text)
-        cb.store()
-
-    def paste_gtk():
-        clipboardContents = gtk.Clipboard().wait_for_text()
-        # for python 2, returns None if the clipboard is blank.
-        if clipboardContents is None:
-            return ''
-        else:
-            return clipboardContents
-
-    return copy_gtk, paste_gtk
-
-
 def init_qt_clipboard():
     global QApplication
     # $DISPLAY should exist
 
-    # Try to import from qtpy, but if that fails try PyQt5 then PyQt4
+    # Try to import from qtpy, but if that fails try PyQt5
     try:
         from qtpy.QtWidgets import QApplication
     except:
-        try:
-            from PyQt5.QtWidgets import QApplication
-        except:
-            from PyQt4.QtGui import QApplication
+        from PyQt5.QtWidgets import QApplication
 
     app = QApplication.instance()
     if app is None:
@@ -529,7 +503,7 @@ def determine_clipboard():
     accordingly.
     '''
 
-    global Foundation, AppKit, gtk, qtpy, PyQt4, PyQt5
+    global Foundation, AppKit, gtk, qtpy, PyQt5
 
     # Setup for the CYGWIN platform:
     if 'cygwin' in platform.system().lower(): # Cygwin has a variety of values returned by platform.system(), such as 'CYGWIN_NT-6.1'
@@ -564,13 +538,6 @@ def determine_clipboard():
     # Thus, we need to detect the presence of $DISPLAY manually
     # and not load PyQt4 if it is absent.
     if os.getenv("DISPLAY"):
-        try:
-            import gtk  # check if gtk is installed
-        except ImportError:
-            pass # We want to fail fast for all non-ImportError exceptions.
-        else:
-            return init_gtk_clipboard()
-
         if (
                 os.getenv("WAYLAND_DISPLAY") and
                 _executable_exists("wl-copy")
@@ -585,25 +552,20 @@ def determine_clipboard():
             return init_klipper_clipboard()
 
         try:
-            # qtpy is a small abstraction layer that lets you write applications using a single api call to either PyQt or PySide.
+            # qtpy is a small abstraction layer that lets you write
+            # applications using a single api call to either PyQt or PySide.
             # https://pypi.python.org/pypi/QtPy
             import qtpy  # check if qtpy is installed
-        except ImportError:
-            # If qtpy isn't installed, fall back on importing PyQt4.
-            try:
-                import PyQt5  # check if PyQt5 is installed
-            except ImportError:
-                try:
-                    import PyQt4  # check if PyQt4 is installed
-                except ImportError:
-                    pass # We want to fail fast for all non-ImportError exceptions.
-                else:
-                    return init_qt_clipboard()
-            else:
-                return init_qt_clipboard()
-        else:
             return init_qt_clipboard()
+        except ImportError:
+            pass
 
+        # If qtpy isn't installed, fall back on importing PyQt5
+        try:
+            import PyQt5  # check if PyQt5 is installed
+            return init_qt_clipboard()
+        except ImportError:
+            pass
 
     return init_no_clipboard()
 
@@ -628,8 +590,7 @@ def set_clipboard(clipboard):
     clipboard_types = {
         "pbcopy": init_osx_pbcopy_clipboard,
         "pyobjc": init_osx_pyobjc_clipboard,
-        "gtk": init_gtk_clipboard,
-        "qt": init_qt_clipboard,  # TODO - split this into 'qtpy', 'pyqt4', and 'pyqt5'
+        "qt": init_qt_clipboard,  # TODO - split this into 'qtpy' and 'pyqt5'
         "xclip": init_xclip_clipboard,
         "xsel": init_xsel_clipboard,
         "wl-clipboard": init_wl_clipboard,
@@ -652,7 +613,7 @@ def lazy_load_stub_copy(text):
 
     This allows users to import pyperclip without having determine_clipboard()
     automatically run, which will automatically select a clipboard mechanism.
-    This could be a problem if it selects, say, the memory-heavy PyQt4 module
+    This could be a problem if it selects, say, the memory-heavy PyQt5 module
     but the user was just going to immediately call set_clipboard() to use a
     different clipboard mechanism.
 
@@ -674,7 +635,7 @@ def lazy_load_stub_paste():
 
     This allows users to import pyperclip without having determine_clipboard()
     automatically run, which will automatically select a clipboard mechanism.
-    This could be a problem if it selects, say, the memory-heavy PyQt4 module
+    This could be a problem if it selects, say, the memory-heavy PyQt5 module
     but the user was just going to immediately call set_clipboard() to use a
     different clipboard mechanism.
 
