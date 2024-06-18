@@ -10,6 +10,7 @@ pyperclip = {editable = true, path = "."}
 [dev-packages]
 tox = "*"
 detox = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.9"
