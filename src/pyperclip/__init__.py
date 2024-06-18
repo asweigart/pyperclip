@@ -26,9 +26,6 @@ Otherwise on Linux, you will need the qtpy or PyQt5 modules installed.
 
 This module does not work with PyGObject yet.
 
-Note: There seems to be a way to get gtk on Python 3, according to:
-    https://askubuntu.com/questions/697397/python3-is-not-supporting-gtk-module
-
 Cygwin is currently not supported.
 
 Security Note: This module runs programs with these names:
@@ -503,7 +500,7 @@ def determine_clipboard():
     accordingly.
     '''
 
-    global Foundation, AppKit, gtk, qtpy, PyQt5
+    global Foundation, AppKit, qtpy, PyQt5
 
     # Setup for the CYGWIN platform:
     if 'cygwin' in platform.system().lower(): # Cygwin has a variety of values returned by platform.system(), such as 'CYGWIN_NT-6.1'
@@ -577,7 +574,6 @@ def set_clipboard(clipboard):
     implement the copy/paste feature. The clipboard parameter must be one of:
         - pbcopy
         - pbobjc (default on Mac OS X)
-        - gtk
         - qt
         - xclip
         - xsel
