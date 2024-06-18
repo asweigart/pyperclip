@@ -53,6 +53,6 @@ In order to work equally well on Windows, Mac, and Linux, Pyperclip uses various
 - ``sudo apt-get install xclip`` to install the ``xclip`` utility (for X11).
 - ``sudo apt-get install wl-clipboard`` to install the ``wl-clipboard`` utility (for Wayland).
 - ``pip install gtk`` to install the gtk Python module.
-- ``pip install PyQt4`` to install the PyQt4 Python module.
+- ``pip install PyQt5`` to install the PyQt5 Python module.
 
 Pyperclip won't work on mobile operating systems such as Android or iOS, nor in browser-based interactive shells such as `replit.com <https://replit.com>`_, `pythontutor.com <http://pythontutor.com>`_, or `pythonanywhere.com <https://pythonanywhere.com>`_.
