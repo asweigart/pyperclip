@@ -531,15 +531,13 @@ def determine_clipboard():
 
     # Setup for the LINUX platform:
 
+    if os.getenv("WAYLAND_DISPLAY") and _executable_exists("wl-copy")  and _executable_exists("wl-paste"):
+        return init_wl_clipboard()
+
     # `import PyQt4` sys.exit()s if DISPLAY is not in the environment.
     # Thus, we need to detect the presence of $DISPLAY manually
     # and not load PyQt4 if it is absent.
-    if os.getenv("DISPLAY"):
-        if (
-                os.getenv("WAYLAND_DISPLAY") and
-                _executable_exists("wl-copy")
-        ):
-            return init_wl_clipboard()
+    elif os.getenv("DISPLAY"):
         if _executable_exists("xclip"):
             # Note: 2024/06/18 Google Trends shows xclip as more popular than xsel.
             return init_xclip_clipboard()
