@@ -99,12 +99,12 @@ def init_osx_pbcopy_clipboard():
         text = _PYTHON_STR_TYPE(text) # Converts non-str values to str.
         p = subprocess.Popen(['pbcopy', 'w'],
                              stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=text.encode(ENCODING))
+        p.communicate(input=text.encode(ENCODING), timeout=1)
 
     def paste_osx_pbcopy():
         p = subprocess.Popen(['pbpaste', 'r'],
                              stdout=subprocess.PIPE, close_fds=True)
-        stdout, stderr = p.communicate()
+        stdout, stderr = p.communicate(timeout=1)
         return stdout.decode(ENCODING)
 
     return copy_osx_pbcopy, paste_osx_pbcopy
@@ -166,7 +166,7 @@ def init_xclip_clipboard():
             selection=PRIMARY_SELECTION
         p = subprocess.Popen(['xclip', '-selection', selection],
                              stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=text.encode(ENCODING))
+        p.communicate(input=text.encode(ENCODING), timeout=1)
 
     def paste_xclip(primary=False):
         selection=DEFAULT_SELECTION
@@ -176,7 +176,7 @@ def init_xclip_clipboard():
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              close_fds=True)
-        stdout, stderr = p.communicate()
+        stdout, stderr = p.communicate(timeout=1)
         # Intentionally ignore extraneous output on stderr when clipboard is empty
         return stdout.decode(ENCODING)
 
@@ -194,7 +194,7 @@ def init_xsel_clipboard():
             selection_flag = PRIMARY_SELECTION
         p = subprocess.Popen(['xsel', selection_flag, '-i'],
                              stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=text.encode(ENCODING))
+        p.communicate(input=text.encode(ENCODING), timeout=1)
 
     def paste_xsel(primary=False):
         selection_flag = DEFAULT_SELECTION
@@ -202,7 +202,7 @@ def init_xsel_clipboard():
             selection_flag = PRIMARY_SELECTION
         p = subprocess.Popen(['xsel', selection_flag, '-o'],
                              stdout=subprocess.PIPE, close_fds=True)
-        stdout, stderr = p.communicate()
+        stdout, stderr = p.communicate(timeout=1)
         return stdout.decode(ENCODING)
 
     return copy_xsel, paste_xsel
@@ -222,14 +222,14 @@ def init_wl_clipboard():
         else:
             pass
             p = subprocess.Popen(args, stdin=subprocess.PIPE, close_fds=True)
-            p.communicate(input=text.encode(ENCODING))
+            p.communicate(input=text.encode(ENCODING), timeout=1)
 
     def paste_wl(primary=False):
         args = ["wl-paste", "-n", "-t", "text"]
         if primary:
             args.append(PRIMARY_SELECTION)
         p = subprocess.Popen(args, stdout=subprocess.PIPE, close_fds=True)
-        stdout, _stderr = p.communicate()
+        stdout, _stderr = p.communicate(timeout=1)
         return stdout.decode(ENCODING)
 
     return copy_wl, paste_wl
@@ -242,13 +242,13 @@ def init_klipper_clipboard():
             ['qdbus', 'org.kde.klipper', '/klipper', 'setClipboardContents',
              text.encode(ENCODING)],
             stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=None)
+        p.communicate(input=None, timeout=1)
 
     def paste_klipper():
         p = subprocess.Popen(
             ['qdbus', 'org.kde.klipper', '/klipper', 'getClipboardContents'],
             stdout=subprocess.PIPE, close_fds=True)
-        stdout, stderr = p.communicate()
+        stdout, stderr = p.communicate(timeout=1)
 
         # Workaround for https://bugs.kde.org/show_bug.cgi?id=342874
         # TODO: https://github.com/asweigart/pyperclip/issues/43
@@ -468,7 +468,7 @@ def init_wsl_clipboard():
         text = _PYTHON_STR_TYPE(text) # Converts non-str values to str.
         p = subprocess.Popen(['clip.exe'],
                              stdin=subprocess.PIPE, close_fds=True)
-        p.communicate(input=text.encode('utf-16le'))
+        p.communicate(input=text.encode('utf-16le'), timeout=1)
 
     def paste_wsl():
         ps_script = '[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((Get-Clipboard -Raw)))'
@@ -478,7 +478,7 @@ def init_wsl_clipboard():
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE,
                              close_fds=True)
-        stdout, stderr = p.communicate()
+        stdout, stderr = p.communicate(timeout=1)
 
         if stderr:
             raise Exception(f"Error pasting from clipboard: {stderr}")
