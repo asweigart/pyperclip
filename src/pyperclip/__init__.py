@@ -228,7 +228,7 @@ def init_wl_clipboard():
         args = ["wl-paste", "-n", "-t", "text"]
         if primary:
             args.append(PRIMARY_SELECTION)
-        p = subprocess.Popen(args, stdout=subprocess.PIPE, close_fds=True)
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
         stdout, _stderr = p.communicate()
         return stdout.decode(ENCODING)
 
