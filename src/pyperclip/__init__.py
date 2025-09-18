@@ -291,7 +291,7 @@ def init_no_clipboard():
         def __call__(self, *args, **kwargs):
             additionalInfo = ''
             if sys.platform == 'linux':
-                additionalInfo = '\nOn Linux, you can run `sudo apt-get install xclip` or `sudo apt-get install xselect` to install a copy/paste mechanism.'
+                additionalInfo = '\nOn Linux, you can run `sudo apt-get install xclip`, `sudo apt-get install xselect` (on X11) or `sudo apt-get install wl-clipboard` (on Wayland) to install a copy/paste mechanism.'
             raise PyperclipException('Pyperclip could not find a copy/paste mechanism for your system. For more information, please visit https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error' + additionalInfo)
 
         if _IS_RUNNING_PYTHON_2:
