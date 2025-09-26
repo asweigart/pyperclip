@@ -3,7 +3,7 @@ people who have submitted patches, reported bugs, added translations, helped
 answer newbie questions, and generally made Pyperclip that much better:
 
 Al Sweigart
-Alexander Cobleigh ‏@cblgh
+Alexander Cobleigh @cblgh
 Andrea Scarpino https://github.com/ilpianista
 Aniket Pandey https://github.com/lordaniket06
 Anton Yakutovich https://github.com/drakulavich
@@ -31,7 +31,8 @@ JustAShoeMaker https://github.com/JustAShoeMaker
 Marcelo Glezer https://github.com/gato
 masajxxx https://github.com/masajxxx
 Maximilian Hils https://github.com/mhils
-mgunyho https://github.com/mgunyho 
+mgunyho https://github.com/mgunyho
+Melwyn Francis Carlo https://github.com/melwyncarlo
 Michał Górny https://github.com/mgorny
 Nicola Guerrera https://github.com/nik012003
 Nikolaos-Digenis Karagiannis https://github.com/Digenis
