@@ -10,17 +10,18 @@ BSD License
 Example Usage
 =============
 
-    >>> import pyperclip
-    >>> pyperclip.copy('The text to be copied to the clipboard.')
-    >>> pyperclip.paste()
-    'The text to be copied to the clipboard.'
-
+```python-console
+>>> import pyperclip
+>>> pyperclip.copy('the text to be copied to the clipboard.')
+>>> pyperclip.paste()
+'the text to be copied to the clipboard.'
+```
 
 Currently only handles plaintext.
 
 On Windows, no additional modules are needed.
 
-On Mac, this module makes use of the pbcopy and pbpaste commands, which should come with the os.
+On Mac, this module makes use of the pbcopy and pbpaste commands, which should come with the OS.
 
 On Linux, this module makes use of the xclip or xsel commands, which should come with the os. Otherwise run "sudo apt-get install xclip" or "sudo apt-get install xsel" (Note: xsel does not always seem to work.)
 
