@@ -645,6 +645,15 @@ def lazy_load_stub_paste():
 
 
 def is_available():
+    """
+    Returns True if a clipboard mechanism is available, False otherwise.
+
+    Triggers clipboard detection if it hasn't happened yet.
+    """
+    global copy, paste
+    if copy == lazy_load_stub_copy or paste == lazy_load_stub_paste:
+        copy, paste = determine_clipboard()
+
     return copy != lazy_load_stub_copy and paste != lazy_load_stub_paste
 
 
