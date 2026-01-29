@@ -600,7 +600,7 @@ def set_clipboard(clipboard):
     copy, paste = clipboard_types[clipboard]()
 
 
-def lazy_load_stub_copy(text):
+def lazy_load_stub_copy(text, primary=False):
     '''
     A stub function for copy(), which will load the real copy() function when
     called so that the real copy() function is used for later calls.
@@ -619,10 +619,13 @@ def lazy_load_stub_copy(text):
     '''
     global copy, paste
     copy, paste = determine_clipboard()
-    return copy(text)
+    try:
+        return copy(text, primary=primary)
+    except TypeError:
+        return copy(text)
 
 
-def lazy_load_stub_paste():
+def lazy_load_stub_paste(primary=False):
     '''
     A stub function for paste(), which will load the real paste() function when
     called so that the real paste() function is used for later calls.
@@ -641,7 +644,10 @@ def lazy_load_stub_paste():
     '''
     global copy, paste
     copy, paste = determine_clipboard()
-    return paste()
+    try:
+        return paste(primary=primary)
+    except TypeError:
+        return paste()
 
 
 def is_available():
