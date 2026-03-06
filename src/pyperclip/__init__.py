@@ -59,6 +59,8 @@ from typing import Union, Optional
 
 _IS_RUNNING_PYTHON_2 = sys.version_info[0] == 2  # type: bool
 
+HAS_DISPLAY = bool(os.getenv("DISPLAY") or os.getenv("WAYLAND_DISPLAY"))
+
 # For paste(): Python 3 uses str, Python 2 uses unicode.
 if _IS_RUNNING_PYTHON_2:
     # mypy complains about `unicode` for Python 2, so we ignore the type error:
@@ -283,6 +285,56 @@ def init_dev_clipboard_clipboard():
         return content
 
     return copy_dev_clipboard, paste_dev_clipboard
+
+
+def init_osc52_clipboard():
+    def _write_to_tty(sequence):
+        try:
+            # Prioritize direct terminal access to avoid polluting pipes/redirections
+            with open('/dev/tty', 'w') as tty:
+                tty.write(sequence)
+                tty.flush()
+            return True
+        except (IOError, OSError):
+            # Fallback to stderr if /dev/tty is unavailable, but only if it's a TTY
+            if sys.stderr.isatty():
+                sys.stderr.write(sequence)
+                sys.stderr.flush()
+                return True
+        return False
+
+    def _wrap_multiplexer(osc_seq):
+        term = os.environ.get("TERM", "").lower()
+        
+        if "TMUX" in os.environ:
+            # tmux requires internal ESCs to be doubled
+            escaped_seq = osc_seq.replace("\x1b", "\x1b\x1b")
+            return "\x1bPtmux;\x1b" + escaped_seq + "\x1b\\"
+        elif term.startswith("screen"):
+            return "\x1bP" + osc_seq + "\x1b\\"
+        
+        return osc_seq
+
+    def copy_osc52(text):
+        text = _PYTHON_STR_TYPE(text)
+        MAX_OSC52_BYTES = 74994 # Yields ~100k Base64 characters, safe for most terminals
+        raw_bytes = text.encode('utf-8')
+        if len(raw_bytes) > MAX_OSC52_BYTES:
+            warnings.warn("Text too large for OSC 52 clipboard. Truncating to safe limit.")
+            raw_bytes = raw_bytes[:MAX_OSC52_BYTES]
+
+        b64_payload = base64.b64encode(raw_bytes).decode('ascii')
+        osc_seq = "\x1b]52;c;" + b64_payload + "\x07"
+        
+        _write_to_tty(_wrap_multiplexer(osc_seq))
+
+    def paste_osc52():
+        raise PyperclipException("Paste is not supported via the OSC 52 fallback backend due to terminal security restrictions.")
+
+    # Only return the OSC 52 backend if we are confident we are in a terminal
+    if sys.stdout.isatty() or sys.stderr.isatty():
+        return copy_osc52, paste_osc52
+    raise PyperclipException("No TTY detected for OSC 52 fallback.")
 
 
 def init_no_clipboard():
@@ -562,6 +614,10 @@ def determine_clipboard():
         except ImportError:
             pass
 
+    # Fallback to OSC 52 if in a terminal
+    if os.environ.get("TERM") and (sys.stdout.isatty() or sys.stderr.isatty()):
+        return init_osc52_clipboard()
+
     return init_no_clipboard()
 
 
@@ -591,6 +647,7 @@ def set_clipboard(clipboard):
         "klipper": init_klipper_clipboard,
         "windows": init_windows_clipboard,
         "no": init_no_clipboard,
+        "osc52": init_osc52_clipboard,
     }
 
     if clipboard not in clipboard_types:

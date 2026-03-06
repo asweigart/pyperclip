@@ -176,5 +176,36 @@ class TestNoClipboard(unittest.TestCase):
             self.paste()
 
 
+class TestOSC52(unittest.TestCase):
+    def test_init_osc52_clipboard_no_tty(self):
+        import sys
+        from pyperclip import init_osc52_clipboard, PyperclipException
+        
+        orig_stdout_isatty = sys.stdout.isatty
+        orig_stderr_isatty = sys.stderr.isatty
+        sys.stdout.isatty = lambda: False
+        sys.stderr.isatty = lambda: False
+        
+        try:
+            with self.assertRaises(PyperclipException):
+                init_osc52_clipboard()
+        finally:
+            sys.stdout.isatty = orig_stdout_isatty
+            sys.stderr.isatty = orig_stderr_isatty
+
+    def test_osc52_paste_raises(self):
+        import sys
+        from pyperclip import init_osc52_clipboard, PyperclipException
+        
+        orig_stdout_isatty = sys.stdout.isatty
+        sys.stdout.isatty = lambda: True
+        try:
+            copy_func, paste_func = init_osc52_clipboard()
+            with self.assertRaises(PyperclipException):
+                paste_func()
+        finally:
+            sys.stdout.isatty = orig_stdout_isatty
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -22,9 +22,11 @@ On Windows, no additional modules are needed.
 
 On Mac, this module makes use of the pbcopy and pbpaste commands, which should come with the os.
 
-On Linux, this module makes use of the xclip or xsel commands, which should come with the os. Otherwise run "sudo apt-get install xclip" or "sudo apt-get install xsel" (Note: xsel does not always seem to work.)
+On Linux, this module makes use of the xclip, xsel, or wl-clipboard commands, which should come with the os. Otherwise run "sudo apt-get install xclip", "sudo apt-get install xsel", or "sudo apt-get install wl-clipboard" (for Wayland).
 
-Otherwise on Linux, you will need the qtpy or PyQT5 modules installed.
+Otherwise on Linux, you will need the qtpy or PyQt5 modules installed.
+
+If no GUI clipboard is available, Pyperclip will fallback to using the OSC 52 terminal escape sequence to copy text if it detects it is running in a terminal (e.g., over SSH). Note that pasting is not supported via OSC 52.
 
 Support
 -------
