@@ -493,6 +493,45 @@ def init_wsl_clipboard():
     return copy_wsl, paste_wsl
 
 
+def init_android_pybox_clipboard():
+
+    def copy_pybox_android(text):
+        text = str(text)
+        subprocess.run(
+            [
+                "am", "broadcast",
+                "-n", "com.vytros.pybox/.api.ClipboardReceiver",
+                "-a", "com.vytros.pybox.api.action.CLIPBOARD_SET",
+                "--es", "text", text,
+                "--user", "0"
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            stdin=subprocess.DEVNULL
+        )
+
+    def paste_pybox_android():
+        result = subprocess.run(
+            [
+                "am", "broadcast",
+                "-n", "com.vytros.pybox/.api.ClipboardReceiver",
+                "-a", "com.vytros.pybox.api.action.CLIPBOARD_GET",
+                "--user", "0"
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            stdin=subprocess.DEVNULL
+        )
+        output = result.stdout.decode()
+        for line in output.splitlines():
+            if "data=" in line:
+                match = line.split('data="', 1)
+                if len(match) > 1:
+                    return match[1].rstrip('"')
+        return ""
+
+    return copy_pybox_android, paste_pybox_android
+
 # Automatic detection of clipboard mechanisms and importing is done in determine_clipboard():
 def determine_clipboard():
     '''
@@ -519,6 +558,10 @@ def determine_clipboard():
             if "microsoft" in f.read().lower():
                 return init_wsl_clipboard()
 
+    # Setup for PyBox environment in Android
+    if platform.system() == 'Android' and "com.vytros.pybox" in sys.executable:
+        return init_android_pybox_clipboard()
+    
     # Setup for the MAC OS X platform:
     if os.name == 'mac' or platform.system() == 'Darwin':
         try:
