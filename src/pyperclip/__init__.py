@@ -67,6 +67,7 @@ else:
     _PYTHON_STR_TYPE = str
 
 ENCODING = 'utf-8'  # type: str
+HAS_DISPLAY = bool(os.environ.get('DISPLAY'))  # type: bool
 
 try:
     # Use shutil.which() for Python 3+
@@ -645,7 +646,10 @@ def lazy_load_stub_paste():
 
 
 def is_available():
-    return copy != lazy_load_stub_copy and paste != lazy_load_stub_paste
+    global copy, paste
+    if copy == lazy_load_stub_copy or paste == lazy_load_stub_paste:
+        copy, paste = determine_clipboard()
+    return bool(copy) and bool(paste)
 
 
 # Initially, copy() and paste() are set to lazy loading wrappers which will
