@@ -8,6 +8,7 @@ import platform
 #import sys
 #sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+import pyperclip
 from pyperclip import _executable_exists, HAS_DISPLAY
 from pyperclip import (init_osx_pbcopy_clipboard, init_osx_pyobjc_clipboard,
                                   init_dev_clipboard_clipboard,
@@ -174,6 +175,43 @@ class TestNoClipboard(unittest.TestCase):
     def test_paste(self):
         with self.assertRaises(RuntimeError):
             self.paste()
+
+
+class TestIsAvailable(unittest.TestCase):
+    def setUp(self):
+        self.original_copy = pyperclip.copy
+        self.original_paste = pyperclip.paste
+        self.original_determine_clipboard = pyperclip.determine_clipboard
+
+    def tearDown(self):
+        pyperclip.copy = self.original_copy
+        pyperclip.paste = self.original_paste
+        pyperclip.determine_clipboard = self.original_determine_clipboard
+
+    def test_is_available_detects_clipboard_before_copy_or_paste(self):
+        def fake_copy(text):
+            pass
+
+        def fake_paste():
+            return ''
+
+        def fake_determine_clipboard():
+            return fake_copy, fake_paste
+
+        pyperclip.copy = pyperclip.lazy_load_stub_copy
+        pyperclip.paste = pyperclip.lazy_load_stub_paste
+        pyperclip.determine_clipboard = fake_determine_clipboard
+
+        self.assertTrue(pyperclip.is_available())
+        self.assertEqual(pyperclip.copy, fake_copy)
+        self.assertEqual(pyperclip.paste, fake_paste)
+
+    def test_is_available_returns_false_when_no_clipboard_is_detected(self):
+        pyperclip.copy = pyperclip.lazy_load_stub_copy
+        pyperclip.paste = pyperclip.lazy_load_stub_paste
+        pyperclip.determine_clipboard = pyperclip.init_no_clipboard
+
+        self.assertFalse(pyperclip.is_available())
 
 
 if __name__ == '__main__':
