@@ -136,7 +136,7 @@ def init_qt_clipboard():
     # Try to import from qtpy, but if that fails try PyQt5
     try:
         from qtpy.QtWidgets import QApplication
-    except:
+    except ImportError:
         from PyQt5.QtWidgets import QApplication
 
     app = QApplication.instance()
