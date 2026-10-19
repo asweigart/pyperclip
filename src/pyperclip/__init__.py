@@ -471,7 +471,7 @@ def init_wsl_clipboard():
         p.communicate(input=text.encode('utf-16le'))
 
     def paste_wsl():
-        ps_script = '[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes((Get-Clipboard -Raw)))'
+        ps_script = '[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes([string](Get-Clipboard -Raw)))'
 
         # '-noprofile' speeds up load time
         p = subprocess.Popen(['powershell.exe', '-noprofile', '-command', ps_script],
