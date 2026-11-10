@@ -16,3 +16,4 @@ else:
     print('clipboard. (If reading this in from the keyboard, press')
     print('CTRL-Z on Windows or CTRL-D on Linux/macOS to stop.')
     print('When pasting, the clipboard will be written to stdout.')
+    sys.exit(1)
